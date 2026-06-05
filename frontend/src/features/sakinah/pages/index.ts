@@ -4,3 +4,7 @@ export * from './SakinahProfileSignalsPage';
 export * from './SakinahPreferencesPage';
 export * from './SakinahConsideredFewPage';
 export * from './SakinahCandidatePage';
+export * from './SakinahMatchflowPage';
+export * from './SakinahConversationPage';
+export * from './SakinahDecisionPage';
+export * from './SakinahSafetyPage';

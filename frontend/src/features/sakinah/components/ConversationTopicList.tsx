@@ -1,5 +1,5 @@
 import React from 'react';
-import { ConversationTopic } from '../../types/sakinah.types';
+import { ConversationTopic } from '../types/sakinah.types';
 
 interface ConversationTopicListProps {
   topics: ConversationTopic[];

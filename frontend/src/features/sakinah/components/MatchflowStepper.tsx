@@ -1,5 +1,5 @@
 import React from 'react';
-import { MatchflowStep } from '../../types/sakinah.types';
+import { MatchflowStep } from '../types/sakinah.types';
 
 interface MatchflowStepperProps {
   currentStep: MatchflowStep;

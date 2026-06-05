@@ -374,6 +374,19 @@ const TradingWatchlistPage = lazy(() =>
   import('@/features/trading/pages/WatchlistPage').then((m) => ({ default: m.WatchlistPage }))
 );
 
+// Sakinah Matchmaking Feature
+const SakinahEntryPage = lazy(() => import('@/features/sakinah/pages/SakinahEntryPage').then(m => ({ default: m.SakinahEntryPage })));
+const SakinahEligibilityPage = lazy(() => import('@/features/sakinah/pages/SakinahEligibilityPage').then(m => ({ default: m.SakinahEligibilityPage })));
+const SakinahProfileSignalsPage = lazy(() => import('@/features/sakinah/pages/SakinahProfileSignalsPage').then(m => ({ default: m.SakinahProfileSignalsPage })));
+const SakinahPreferencesPage = lazy(() => import('@/features/sakinah/pages/SakinahPreferencesPage').then(m => ({ default: m.SakinahPreferencesPage })));
+const SakinahConsideredFewPage = lazy(() => import('@/features/sakinah/pages/SakinahConsideredFewPage').then(m => ({ default: m.SakinahConsideredFewPage })));
+const SakinahCandidatePage = lazy(() => import('@/features/sakinah/pages/SakinahCandidatePage').then(m => ({ default: m.SakinahCandidatePage })));
+const SakinahMatchflowPage = lazy(() => import('@/features/sakinah/pages/SakinahMatchflowPage').then(m => ({ default: m.SakinahMatchflowPage })));
+const SakinahConversationPage = lazy(() => import('@/features/sakinah/pages/SakinahConversationPage').then(m => ({ default: m.SakinahConversationPage })));
+const SakinahDecisionPage = lazy(() => import('@/features/sakinah/pages/SakinahDecisionPage').then(m => ({ default: m.SakinahDecisionPage })));
+const SakinahSafetyPage = lazy(() => import('@/features/sakinah/pages/SakinahSafetyPage').then(m => ({ default: m.SakinahSafetyPage })));
+
+
 // AEBCD onboarding — Stage A marketing landing at /welcome.
 const StageALanding = lazy(() => import('@/features/onboarding/pages/StageALanding'));
 
@@ -792,6 +805,17 @@ export const router = createBrowserRouter([
       { path: 'trading', element: <LazyPage Component={TradingHomePage} /> },
       { path: 'trading/watchlist', element: <LazyPage Component={TradingWatchlistPage} /> },
       { path: 'trading/stock/:symbol', element: <LazyPage Component={TradingStockDetailPage} /> },
+      // Sakinah Routes
+      { path: 'sakinah', element: <LazyPage Component={SakinahEntryPage} /> },
+      { path: 'sakinah/eligibility', element: <LazyPage Component={SakinahEligibilityPage} /> },
+      { path: 'sakinah/profile', element: <LazyPage Component={SakinahProfileSignalsPage} /> },
+      { path: 'sakinah/preferences', element: <LazyPage Component={SakinahPreferencesPage} /> },
+      { path: 'sakinah/considered-few', element: <LazyPage Component={SakinahConsideredFewPage} /> },
+      { path: 'sakinah/candidate/:candidateId', element: <LazyPage Component={SakinahCandidatePage} /> },
+      { path: 'sakinah/matchflow/:matchflowId', element: <LazyPage Component={SakinahMatchflowPage} /> },
+      { path: 'sakinah/conversation/:conversationId', element: <LazyPage Component={SakinahConversationPage} /> },
+      { path: 'sakinah/decision/:matchflowId', element: <LazyPage Component={SakinahDecisionPage} /> },
+      { path: 'sakinah/safety', element: <LazyPage Component={SakinahSafetyPage} /> },
     ],
   },
 
