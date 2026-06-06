@@ -1,22 +1,33 @@
 import pytest  # type: ignore
 from app.nis.services.mutual_interest_service import NISMutualInterestService
 from fastapi.testclient import TestClient
-from fastapi import FastAPI
-from app.api.v1.nis.interests import router
+from app.main import app
+from app.core.security import get_current_user
+from app.nis.schemas.auth import UserContext
 
-app = FastAPI()
-app.include_router(router, prefix="/api/v1/nis")
 client = TestClient(app)
 
 @pytest.fixture(autouse=True)
 def setup_teardown():
+    # Setup state
     NISMutualInterestService.clear_mock_state()
     NISMutualInterestService.seed_mock_state(
         user_status={"user_a": "VERIFIED", "user_b": "VERIFIED", "user_banned": "BANNED", "user_1": "VERIFIED"},
         candidate_status={"cand_good": "HIGH_CONFIDENCE_MATCH", "cand_bad": "LOW_CONFIDENCE_DO_NOT_SHOW"}
     )
+    
+    # Override dependency for this module's tests
+    def override_get_current_user():
+        return UserContext(user_id="user_1")
+    app.dependency_overrides[get_current_user] = override_get_current_user
+    
     yield
+    
+    # Teardown state
     NISMutualInterestService.clear_mock_state()
+    app.dependency_overrides.clear()
+
+
 
 def test_user_can_record_private_interest():
     res = NISMutualInterestService.record_interest("user_a", "cand_good")
