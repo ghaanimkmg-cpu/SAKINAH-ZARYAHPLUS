@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Enum as SQLEnum, ForeignKey, Integer, Boolean, Float, Text, JSON
+from sqlalchemy import Column, String, Enum as SQLEnum, ForeignKey, Integer, Boolean, Float, Text, JSON  # type: ignore
 from app.nis.models.base import NISBaseModel
 from app.nis.enums.nis_enums import EligibilityStatus
 
