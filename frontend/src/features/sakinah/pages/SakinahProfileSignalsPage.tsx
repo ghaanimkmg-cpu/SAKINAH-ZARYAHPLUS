@@ -7,29 +7,37 @@ export const SakinahProfileSignalsPage: React.FC = () => {
   const navigate = useNavigate();
   const [isPending, setIsPending] = useState(false);
   const [errorFallback, setErrorFallback] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [approach, setApproach] = useState('');
   const [prayer, setPrayer] = useState('');
   const [timeline, setTimeline] = useState('');
+  const [note, setNote] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorFallback('');
+    setFieldErrors({});
 
-    if (!approach || !prayer || !timeline) {
-      setErrorFallback('Please complete the required fields before continuing.');
+    const errors: Record<string, string> = {};
+    if (!approach) errors.approach = 'Please select your approach.';
+    if (!prayer) errors.prayer = 'Please select a prayer frequency.';
+    if (!timeline) errors.timeline = 'Please select a timeline.';
+    if (!note.trim()) errors.note = 'Please provide a short note about your journey.';
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setErrorFallback('Please complete all required fields before continuing.');
       return;
     }
 
     setIsPending(true);
     try {
-      // In a real app we'd collect form data. For now we pass a mock payload.
-      await updateSakinahProfile({ timelineToMarry: '1_year' });
+      await updateSakinahProfile({ timelineToMarry: timeline });
       navigate('/sakinah/preferences');
     } catch (err) {
       console.warn('Backend offline, using dev fallback for SakinahProfileSignals', err);
       setErrorFallback('Backend unreachable. Proceeding in Development Preview Mode.');
-      // Dev fallback: allow navigation even if backend is down
       setTimeout(() => navigate('/sakinah/preferences'), 1000);
     } finally {
       setIsPending(false);
@@ -47,13 +55,14 @@ export const SakinahProfileSignalsPage: React.FC = () => {
 
         {errorFallback && <DevFallbackBadge message={errorFallback} />}
 
-        <form className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSubmit}>
+        <form className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSubmit} noValidate>
           <SakinahSelect
             label="Sect / Thought"
             value={approach}
-            onChange={(e) => setApproach(e.target.value)}
+            onChange={(e) => { setApproach(e.target.value); setFieldErrors(prev => ({...prev, approach: ''})); }}
             placeholder="Choose your approach"
             required
+            error={fieldErrors.approach}
             options={[
               { value: 'sunni', label: 'Sunni' },
               { value: 'shia', label: 'Shia' },
@@ -64,9 +73,10 @@ export const SakinahProfileSignalsPage: React.FC = () => {
           <SakinahSelect
             label="Prayer Frequency"
             value={prayer}
-            onChange={(e) => setPrayer(e.target.value)}
+            onChange={(e) => { setPrayer(e.target.value); setFieldErrors(prev => ({...prev, prayer: ''})); }}
             placeholder="Choose a frequency"
             required
+            error={fieldErrors.prayer}
             options={[
               { value: 'always', label: 'Always Prays' },
               { value: 'usually', label: 'Usually Prays' },
@@ -78,9 +88,10 @@ export const SakinahProfileSignalsPage: React.FC = () => {
           <SakinahSelect
             label="Timeline to Marry"
             value={timeline}
-            onChange={(e) => setTimeline(e.target.value)}
+            onChange={(e) => { setTimeline(e.target.value); setFieldErrors(prev => ({...prev, timeline: ''})); }}
             placeholder="Choose a timeline"
             required
+            error={fieldErrors.timeline}
             options={[
               { value: 'asap', label: 'As soon as possible' },
               { value: '1_year', label: 'Within 1 year' },
@@ -90,9 +101,13 @@ export const SakinahProfileSignalsPage: React.FC = () => {
 
           <SakinahTextarea
             label="A short note about your journey"
+            value={note}
+            onChange={(e) => { setNote(e.target.value); setFieldErrors(prev => ({...prev, note: ''})); }}
             rows={4}
             placeholder="What are you looking to build together?"
             className="md:col-span-2"
+            required
+            error={fieldErrors.note}
           />
 
           <div className="md:col-span-2">

@@ -7,22 +7,34 @@ export const SakinahPreferencesPage: React.FC = () => {
   const navigate = useNavigate();
   const [isPending, setIsPending] = useState(false);
   const [errorFallback, setErrorFallback] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [relocation, setRelocation] = useState('');
+  const [ageMin, setAgeMin] = useState('');
+  const [ageMax, setAgeMax] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorFallback('');
+    setFieldErrors({});
 
-    if (!relocation) {
-      setErrorFallback('Please complete the required fields before continuing.');
+    const errors: Record<string, string> = {};
+    if (!ageMin) errors.ageMin = 'Required.';
+    if (!ageMax) errors.ageMax = 'Required.';
+    if (ageMin && ageMax && parseInt(ageMin) > parseInt(ageMax)) {
+      errors.ageMin = 'Min > Max';
+    }
+    if (!relocation) errors.relocation = 'Please select a relocation preference.';
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setErrorFallback('Please complete all required fields before continuing.');
       return;
     }
 
     setIsPending(true);
     try {
-      // In a real app we'd collect form data. For now we pass a mock payload.
-      await updateSakinahPreferences({ relocationWillingness: true });
+      await updateSakinahPreferences({ relocationWillingness: relocation === 'yes' || relocation === 'flexible' });
       navigate('/sakinah/considered-few');
     } catch (err) {
       console.warn('Backend offline, using dev fallback for SakinahPreferences', err);
@@ -44,19 +56,30 @@ export const SakinahPreferencesPage: React.FC = () => {
 
         {errorFallback && <DevFallbackBadge message={errorFallback} />}
 
-        <form className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 items-start" onSubmit={handleSubmit}>
+        <form className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 items-start" onSubmit={handleSubmit} noValidate>
           <div className="space-y-2">
-            <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853]">Age Range Preference</label>
+            <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853] flex items-center gap-2">
+              Age Range Preference
+              <span className="text-[#D4A853]/60">*</span>
+            </label>
             <div className="flex gap-4">
               <SakinahInput 
                 type="number" 
                 placeholder="Min"
                 className="flex-1"
+                value={ageMin}
+                onChange={(e) => { setAgeMin(e.target.value); setFieldErrors(prev => ({...prev, ageMin: ''})); }}
+                required
+                error={fieldErrors.ageMin}
               />
               <SakinahInput 
                 type="number" 
                 placeholder="Max"
                 className="flex-1"
+                value={ageMax}
+                onChange={(e) => { setAgeMax(e.target.value); setFieldErrors(prev => ({...prev, ageMax: ''})); }}
+                required
+                error={fieldErrors.ageMax}
               />
             </div>
           </div>
@@ -64,9 +87,10 @@ export const SakinahPreferencesPage: React.FC = () => {
           <SakinahSelect
             label="Willingness to Relocate"
             value={relocation}
-            onChange={(e) => setRelocation(e.target.value)}
+            onChange={(e) => { setRelocation(e.target.value); setFieldErrors(prev => ({...prev, relocation: ''})); }}
             placeholder="Choose an option"
             required
+            error={fieldErrors.relocation}
             options={[
               { value: 'yes', label: 'Yes, open to relocating' },
               { value: 'no', label: 'No, prefer to stay locally' },

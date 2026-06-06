@@ -18,6 +18,7 @@ export const SakinahConversationPage: React.FC = () => {
   const { conversationId } = useParams();
   const [messages, setMessages] = useState<{sender: string, text: string}[]>([]);
   const [inputText, setInputText] = useState('');
+  const [inputError, setInputError] = useState('');
   const [isPending, setIsPending] = useState(false);
   const [contactWarning, setContactWarning] = useState(false);
 
@@ -30,7 +31,12 @@ export const SakinahConversationPage: React.FC = () => {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
+    setInputError('');
+
+    if (!inputText.trim()) {
+      setInputError('Message cannot be empty.');
+      return;
+    }
 
     // Contact leak detection simulation
     if (inputText.includes('@') || inputText.match(/\d{5,}/)) {
@@ -41,7 +47,7 @@ export const SakinahConversationPage: React.FC = () => {
 
     setIsPending(true);
     try {
-      await sendConversationMessage(conversationId || 'mock', inputText);
+      await sendConversationMessage(conversationId || 'mock', 't1', inputText);
       setMessages([...messages, { sender: 'You', text: inputText }]);
       setInputText('');
     } catch (err) {
@@ -86,13 +92,15 @@ export const SakinahConversationPage: React.FC = () => {
             )}
           </SakinahCard>
 
-          <form onSubmit={handleSendMessage} className="flex gap-2 items-start mb-6">
+          <form onSubmit={handleSendMessage} className="flex gap-2 items-start mb-6" noValidate>
             <SakinahInput 
               type="text" 
               value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
+              onChange={(e) => { setInputText(e.target.value); setInputError(''); }}
               placeholder="Type your message..."
               className="flex-1"
+              required
+              error={inputError}
             />
             <SakinahButton 
               type="submit" 
