@@ -50,3 +50,108 @@ class NISConsideredFewService:
             candidates=candidates_out,
             message="A small number of carefully considered candidates are available."
         )
+
+    @classmethod
+    def get_considered_few(cls, user_id: str) -> ConsideredFewResponse:
+        from app.nis.services.hard_filter_engine import NISHardFilterEngine, FilterCandidateState, FilterPreferences
+        from app.nis.services.compatibility_engine import NISCompatibilityEngine
+        from app.nis.schemas.user_signal_profile import UserSignalProfile
+        from app.nis.services.confidence_threshold_service import NISConfidenceThresholdService, CandidateInputs
+
+        # MOCK USER REPOSITORY FOR DEVELOPMENT/TESTING
+        # In a real system, this fetches from the DB.
+        user_state = FilterCandidateState(
+            is_verified=True, is_banned=False, is_under_review=False,
+            has_profile=True, has_preferences=True,
+            age=28, active_conversations=0, location="Chennai",
+            timeline="1_YEAR", tradition="Sunni", wali="REQUIRED",
+            marital_status="NEVER_MARRIED", relocation_openness="OPEN"
+        )
+        user_prefs = FilterPreferences(
+            age_min=24, age_max=30, location_pref="ANY", timeline_pref="ANY",
+            tradition_pref="Sunni", wali_pref="ANY", marital_status_pref="NEVER_MARRIED"
+        )
+        user_profile = UserSignalProfile(
+            emotional_steadiness="STEADY", communication_style="DIRECT", conflict_repair_style="PROACTIVE",
+            deen_alignment="STRONG", family_responsibility="HIGH", marriage_readiness="READY",
+            financial_expectation="MODERATE", life_direction="BUILDING", wali_comfort="COMFORTABLE", social_lifestyle="BALANCED",
+            self_awareness_level="HIGH"
+        )
+
+        candidates = [
+            {
+                "id": "mock_candidate_1",
+                "state": FilterCandidateState(
+                    is_verified=True, is_banned=False, is_under_review=False, has_profile=True, has_preferences=True,
+                    age=27, active_conversations=0, location="Chennai", timeline="1_YEAR", tradition="Sunni",
+                    wali="REQUIRED", marital_status="NEVER_MARRIED", relocation_openness="OPEN"
+                ),
+                "prefs": FilterPreferences(26, 32, "ANY", "ANY", "Sunni", "ANY", "NEVER_MARRIED"),
+                "profile": UserSignalProfile(
+                    emotional_steadiness="STEADY", communication_style="DIRECT", conflict_repair_style="PROACTIVE",
+                    deen_alignment="STRONG", family_responsibility="HIGH", marriage_readiness="READY",
+                    financial_expectation="MODERATE", life_direction="BUILDING", wali_comfort="COMFORTABLE", social_lifestyle="BALANCED",
+                    self_awareness_level="HIGH"
+                )
+            },
+            {
+                "id": "mock_candidate_blocked_age",
+                "state": FilterCandidateState(
+                    is_verified=True, is_banned=False, is_under_review=False, has_profile=True, has_preferences=True,
+                    age=20, active_conversations=0, location="Chennai", timeline="1_YEAR", tradition="Sunni",
+                    wali="REQUIRED", marital_status="NEVER_MARRIED", relocation_openness="OPEN"
+                ),
+                "prefs": FilterPreferences(26, 32, "ANY", "ANY", "Sunni", "ANY", "NEVER_MARRIED"),
+                "profile": UserSignalProfile(
+                    emotional_steadiness="STEADY", communication_style="DIRECT", conflict_repair_style="PROACTIVE",
+                    deen_alignment="STRONG", family_responsibility="HIGH", marriage_readiness="READY",
+                    financial_expectation="MODERATE", life_direction="BUILDING", wali_comfort="COMFORTABLE", social_lifestyle="BALANCED",
+                    self_awareness_level="HIGH"
+                )
+            },
+            {
+                "id": "mock_candidate_weak_match",
+                "state": FilterCandidateState(
+                    is_verified=True, is_banned=False, is_under_review=False, has_profile=True, has_preferences=True,
+                    age=26, active_conversations=0, location="Chennai", timeline="1_YEAR", tradition="Sunni",
+                    wali="REQUIRED", marital_status="NEVER_MARRIED", relocation_openness="OPEN"
+                ),
+                "prefs": FilterPreferences(26, 32, "ANY", "ANY", "Sunni", "ANY", "NEVER_MARRIED"),
+                "profile": UserSignalProfile(
+                    emotional_steadiness="VOLATILE", communication_style="INDIRECT", conflict_repair_style="AVOIDANT",
+                    deen_alignment="WEAK", family_responsibility="LOW", marriage_readiness="NOT_READY",
+                    financial_expectation="HIGH", life_direction="UNDEFINED", wali_comfort="UNCOMFORTABLE", social_lifestyle="VERY_SOCIAL",
+                    self_awareness_level="LOW"
+                )
+            }
+        ]
+
+        inputs = []
+        for c in candidates:
+            # 1. Hard Filter Engine
+            hard_result = NISHardFilterEngine.evaluate(
+                user_state, user_prefs, c["state"], c["prefs"]
+            )
+            
+            # 2. Compatibility Engine
+            comp_result = NISCompatibilityEngine.evaluate(user_profile, c["profile"])
+
+            # 3. Confidence Threshold
+            conf_input = CandidateInputs(
+                candidate_user_id=c["id"],
+                hard_filter_result=hard_result,
+                compatibility_result=comp_result,
+                safety_risk_level="LOW",
+                profile_data_complete=True,
+                preference_data_complete=True
+            )
+            conf_result = NISConfidenceThresholdService.evaluate_candidate(conf_input)
+
+            inputs.append(ConsideredFewInput(
+                confidence_result=conf_result,
+                shared_strengths=comp_result.shared_strengths,
+                possible_tension_points=comp_result.possible_tension_points
+            ))
+
+        # 4. Generate Pool
+        return cls.generate_pool(inputs)
