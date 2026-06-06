@@ -3,14 +3,18 @@ from typing import List, Optional
 
 class DimensionScore(BaseModel):
     dimension: str
-    score: int  # 0 to 100
+    status: str  # STRONG, MODERATE, WEAK, INCOMPATIBLE
     notes: Optional[str] = None
     is_tension_point: bool = False
     is_dangerous_mismatch: bool = False
+    is_shared_strength: bool = False
 
 class CompatibilityResult(BaseModel):
-    overall_score: int
-    dimensions: List[DimensionScore]
-    tension_points: List[str]
+    compatibility_status: str
+    confidence_level: str
+    dimension_results: List[DimensionScore]
+    shared_strengths: List[str]
+    possible_tension_points: List[str]
     dangerous_mismatches: List[str]
-    is_compatible: bool
+    reasoning_summary: str
+    review_required: bool

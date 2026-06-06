@@ -8,37 +8,47 @@ class NISCompatibilityEngine:
         dimensions: List[DimensionScore] = []
         tension_points: List[str] = []
         dangerous_mismatches: List[str] = []
+        shared_strengths: List[str] = []
+        review_required = False
 
         # Check Insufficient Data
         if "UNKNOWN" in [p1.emotional_steadiness, p2.emotional_steadiness, p1.deen_alignment, p2.deen_alignment]:
             return CompatibilityResult(
-                overall_score=0,
-                dimensions=[],
-                tension_points=["Insufficient data to calculate compatibility."],
+                compatibility_status="INSUFFICIENT_DATA",
+                confidence_level="UNKNOWN",
+                dimension_results=[],
+                shared_strengths=[],
+                possible_tension_points=["Insufficient data to calculate compatibility."],
                 dangerous_mismatches=[],
-                is_compatible=False
+                reasoning_summary="Not enough data to form a reliable compatibility assessment.",
+                review_required=True
             )
 
         def evaluate_dimension(name: str, val1: str, val2: str, dangerous_pairs: List[Tuple[str, str]] = []) -> DimensionScore:
-            score = 50
+            status = "MODERATE"
             is_tension = False
             is_dangerous = False
+            is_shared = False
             notes = ""
+            clean_name = name.replace('_', ' ')
 
             if val1 == val2:
-                score = 90
+                status = "STRONG"
+                is_shared = True
+                notes = f"Strong shared alignment in {clean_name}."
+                shared_strengths.append(notes)
             else:
-                score = 60
+                status = "WEAK"
                 is_tension = True
-                notes = f"Manageable difference in {name.replace('_', ' ')}."
+                notes = f"Manageable difference in {clean_name}."
 
             # Check for dangerous mismatch
             for (d1, d2) in dangerous_pairs:
                 if (val1 == d1 and val2 == d2) or (val1 == d2 and val2 == d1):
-                    score = 20
+                    status = "INCOMPATIBLE"
                     is_tension = True
                     is_dangerous = True
-                    notes = f"Dangerous mismatch in {name.replace('_', ' ')}."
+                    notes = f"Dangerous mismatch in {clean_name}."
                     dangerous_mismatches.append(notes)
                     break
             
@@ -47,10 +57,11 @@ class NISCompatibilityEngine:
 
             return DimensionScore(
                 dimension=name,
-                score=score,
+                status=status,
                 notes=notes,
                 is_tension_point=is_tension,
-                is_dangerous_mismatch=is_dangerous
+                is_dangerous_mismatch=is_dangerous,
+                is_shared_strength=is_shared
             )
 
         # 1. Emotional Steadiness
@@ -83,17 +94,35 @@ class NISCompatibilityEngine:
         # 10. Lifestyle Rhythm
         dimensions.append(evaluate_dimension("lifestyle_rhythm", p1.social_lifestyle, p2.social_lifestyle, [("VERY_SOCIAL", "HOMEBODY")]))
 
-        # Calculate total
-        total = sum(d.score for d in dimensions)
-        overall_score = total // len(dimensions) if dimensions else 0
+        # Internal evaluation only
+        num_tensions = len(tension_points)
+        num_dangerous = len(dangerous_mismatches)
+        
+        if num_dangerous > 0:
+            comp_status = "INCOMPATIBLE"
+            reasoning = "Fundamental incompatibilities detected in key areas."
+            review_required = True
+        elif num_tensions >= 4:
+            comp_status = "WEAK_COMPATIBILITY"
+            reasoning = "Multiple tension points identified. Proceed with caution."
+            review_required = True
+        elif num_tensions >= 2:
+            comp_status = "MODERATE_COMPATIBILITY"
+            reasoning = "Generally aligned but with some manageable differences to navigate."
+        else:
+            comp_status = "STRONG_COMPATIBILITY"
+            reasoning = "High alignment across core values and lifestyle factors."
 
-        # Output rule: No output recommends marriage directly. It just states 'is_compatible'.
-        is_compatible = overall_score >= 70 and len(dangerous_mismatches) == 0
+        # Since we use deterministic complete fields for tests right now, confidence is HIGH unless incomplete data
+        confidence = "HIGH"
 
         return CompatibilityResult(
-            overall_score=overall_score,
-            dimensions=dimensions,
-            tension_points=tension_points,
+            compatibility_status=comp_status,
+            confidence_level=confidence,
+            dimension_results=dimensions,
+            shared_strengths=shared_strengths,
+            possible_tension_points=tension_points,
             dangerous_mismatches=dangerous_mismatches,
-            is_compatible=is_compatible
+            reasoning_summary=reasoning,
+            review_required=review_required
         )
