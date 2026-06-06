@@ -74,14 +74,14 @@ class NISConfidenceThresholdService:
                 blocked_reasons=blocked_reasons
             )
 
-        if comp.compatibility_status == "INCOMPATIBLE":
-            blocked_reasons.append("Compatibility is completely blocked")
+        if comp.compatibility_status == "INCOMPATIBLE" or comp.review_required or len(comp.dangerous_mismatches) > 0:
+            blocked_reasons.append("Dangerous pair dynamics or review required")
             return CandidateConfidenceResult(
                 candidate_user_id=inputs.candidate_user_id,
-                final_status="HARD_REJECT",
+                final_status="HARD_REJECT" if comp.compatibility_status == "INCOMPATIBLE" else "MODERATE_CONFIDENCE_REVIEW",
                 confidence_level="UNKNOWN",
                 can_show_candidate=False,
-                requires_human_review=False,
+                requires_human_review=True,
                 reasons=reasons,
                 blocked_reasons=blocked_reasons
             )
