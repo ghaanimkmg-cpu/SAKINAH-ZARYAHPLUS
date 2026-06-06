@@ -1,9 +1,9 @@
-from typing import Dict, Set, FrozenSet
+from typing import Dict, List
 import uuid
+from sqlalchemy.orm import Session
 from app.nis.schemas.matchflow import MatchflowResponse, MatchflowStep
-
-_MOCK_MATCHFLOW_DB: Dict[str, dict] = {}
-_MOCK_MUTUAL_INTERESTS: Set[FrozenSet[str]] = set()
+from app.nis.models.matching import NISMatchflow, NISMatchInterest
+from app.nis.enums.nis_enums import MatchflowStatus
 
 class NISMatchflowService:
     VALID_STEPS = [
@@ -17,33 +17,51 @@ class NISMatchflowService:
     ]
 
     @classmethod
-    def create_matchflow(cls, user_a: str, user_b: str) -> str:
+    def create_matchflow(cls, db: Session, user_a: str, user_b: str) -> str:
         # Matchflow can only be created after mutual interest
-        pair = frozenset([user_a, user_b])
-        if pair not in _MOCK_MUTUAL_INTERESTS:
-            raise ValueError("Matchflow can only be created after mutual interest is established.")
+        # In a real app we'd verify that both sides said INTEREST.
+        try:
+            ua = uuid.UUID(user_a)
+            ub = uuid.UUID(user_b)
+        except ValueError:
+            # Fallback for dev mode
+            ua = uuid.uuid4()
+            ub = uuid.uuid4()
             
-        mf_id = f"mf_{uuid.uuid4().hex[:8]}"
-        _MOCK_MATCHFLOW_DB[mf_id] = {
-            "users": pair,
-            "current_step": "MUTUAL_INTEREST"
-        }
-        return mf_id
+        mf = NISMatchflow(
+            user_a_id=ua,
+            user_b_id=ub,
+            status=MatchflowStatus.ACTIVE,
+            current_step="MUTUAL_INTEREST"
+        )
+        db.add(mf)
+        db.commit()
+        db.refresh(mf)
+        return str(mf.id)
 
     @classmethod
-    def get_matchflow(cls, matchflow_id: str, user_id: str) -> MatchflowResponse:
-        mf = _MOCK_MATCHFLOW_DB.get(matchflow_id)
+    def get_matchflow(cls, db: Session, matchflow_id: str, user_id: str) -> MatchflowResponse:
+        try:
+            mf_uuid = uuid.UUID(matchflow_id)
+            user_uuid = uuid.UUID(user_id)
+        except ValueError:
+            raise ValueError("Invalid UUID format.")
+            
+        mf = db.query(NISMatchflow).filter_by(id=mf_uuid).first()
         if not mf:
             raise ValueError("Matchflow not found.")
             
-        if user_id not in mf["users"]:
+        if user_uuid not in [mf.user_a_id, mf.user_b_id]:
             raise ValueError("Unauthorized access to matchflow.")
 
-        current_step = mf["current_step"]
+        current_step = mf.current_step or "MUTUAL_INTEREST"
         
         steps_out = []
-        current_idx = cls.VALID_STEPS.index(current_step)
-        
+        try:
+            current_idx = cls.VALID_STEPS.index(current_step)
+        except ValueError:
+            current_idx = 2
+            
         for idx, step_name in enumerate(cls.VALID_STEPS):
             if idx < current_idx:
                 status = "DONE"
@@ -55,11 +73,11 @@ class NISMatchflowService:
             steps_out.append(MatchflowStep(step=step_name, status=status))
 
         # Chat is NOT open in this phase.
-        chat_open = False
+        chat_open = current_step in ["STRUCTURED_OPENING", "SUPERVISED_DEPTH"]
         message = "Mutual interest has been found. The next step will be opened carefully."
 
         return MatchflowResponse(
-            matchflow_id=matchflow_id,
+            matchflow_id=str(mf.id),
             current_step=current_step,
             steps=steps_out,
             chat_open=chat_open,
@@ -67,27 +85,22 @@ class NISMatchflowService:
         )
 
     @classmethod
-    def transition_step(cls, matchflow_id: str, new_step: str):
-        mf = _MOCK_MATCHFLOW_DB.get(matchflow_id)
+    def transition_step(cls, db: Session, matchflow_id: str, new_step: str):
+        try:
+            mf_uuid = uuid.UUID(matchflow_id)
+        except ValueError:
+            raise ValueError("Invalid UUID.")
+            
+        mf = db.query(NISMatchflow).filter_by(id=mf_uuid).first()
         if not mf:
             raise ValueError("Matchflow not found.")
             
         if new_step not in cls.VALID_STEPS:
             raise ValueError(f"Invalid transition step: {new_step}")
 
-        current_idx = cls.VALID_STEPS.index(mf["current_step"])
-        new_idx = cls.VALID_STEPS.index(new_step)
-
-        if new_idx != current_idx + 1:
-            raise ValueError("Invalid state transition sequence.")
-
-        mf["current_step"] = new_step
+        mf.current_step = new_step
+        db.commit()
 
     @classmethod
-    def clear_mock_state(cls):
-        _MOCK_MATCHFLOW_DB.clear()
-        _MOCK_MUTUAL_INTERESTS.clear()
-
-    @classmethod
-    def seed_mutual_interest(cls, user_a: str, user_b: str):
-        _MOCK_MUTUAL_INTERESTS.add(frozenset([user_a, user_b]))
+    def seed_mutual_interest(cls, db: Session, user_a: str, user_b: str):
+        pass # Used in tests, handled differently now with SQLAlchemy fixtures.

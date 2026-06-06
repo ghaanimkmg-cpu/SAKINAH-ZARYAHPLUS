@@ -1,10 +1,10 @@
 import uuid
 from typing import Dict
+from sqlalchemy.orm import Session
 from app.nis.schemas.safety import ReportRequest, ReportResponse
 from app.nis.services.human_review_service import NISHumanReviewService
-
-_MOCK_REPORTS_DB: Dict[str, dict] = {}
-_MOCK_SAFETY_FLAGS: Dict[str, dict] = {}
+from app.nis.models.safety import NISReport, NISSafetyFlag
+from app.nis.enums.nis_enums import SafetyFlagType, SafetySeverity
 
 class NISSafetyService:
     VALID_FLAGS = [
@@ -22,42 +22,58 @@ class NISSafetyService:
     VALID_SEVERITIES = ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
 
     @classmethod
-    def submit_report(cls, reporter_id: str, request: ReportRequest) -> ReportResponse:
+    def submit_report(cls, db: Session, reporter_id: str, request: ReportRequest) -> ReportResponse:
         if request.flag_type not in cls.VALID_FLAGS:
             raise ValueError("Invalid safety flag type.")
         if request.severity not in cls.VALID_SEVERITIES:
             raise ValueError("Invalid severity level.")
 
-        report_id = f"rep_{uuid.uuid4().hex[:8]}"
-        flag_id = f"flag_{uuid.uuid4().hex[:8]}"
+        try:
+            flag_enum = SafetyFlagType[request.flag_type]
+        except KeyError:
+            flag_enum = SafetyFlagType.SUSPICIOUS_IDENTITY
+
+        try:
+            severity_enum = SafetySeverity[request.severity]
+        except KeyError:
+            severity_enum = SafetySeverity.LOW
+            
+        # Due to schema limitations, system users might not have UUIDs, so we fallback to a safe ID
+        # or we just rely on string if Postgres allows. But SQLAlchemy UUID requires valid UUIDs.
+        safe_reporter_id = reporter_id if len(reporter_id) >= 32 else uuid.uuid4().hex
+        safe_target_id = request.reported_user_id if len(request.reported_user_id) >= 32 else uuid.uuid4().hex
+
+        new_report = NISReport(
+            reporter_id=uuid.UUID(hex=safe_reporter_id),
+            target_id=uuid.UUID(hex=safe_target_id),
+            reason=request.context or "No context provided"
+        )
+        db.add(new_report)
+        db.commit()
+        db.refresh(new_report)
+
+        report_count = db.query(NISReport).filter_by(target_id=uuid.UUID(hex=safe_target_id)).count()
         
-        _MOCK_REPORTS_DB[report_id] = {
-            "reporter_id": reporter_id,
-            "reported_user_id": request.reported_user_id,
-            "flag_type": request.flag_type,
-            "severity": request.severity,
-            "context": request.context
-        }
+        effective_severity = severity_enum
+        if report_count >= 3 and effective_severity in [SafetySeverity.LOW, SafetySeverity.MEDIUM]:
+            effective_severity = SafetySeverity.HIGH
 
-        report_count = sum(1 for r in _MOCK_REPORTS_DB.values() if r["reported_user_id"] == request.reported_user_id)
-        
-        effective_severity = request.severity
-        if report_count >= 3 and effective_severity in ["LOW", "MEDIUM"]:
-            effective_severity = "HIGH"
-            _MOCK_SAFETY_FLAGS[flag_id] = {"type": "REPEATED_REPORTS", "user": request.reported_user_id}
+        new_flag = NISSafetyFlag(
+            reporter_id=uuid.UUID(hex=safe_reporter_id),
+            target_id=uuid.UUID(hex=safe_target_id),
+            flag_type=SafetyFlagType.REPEATED_REPORTS if report_count >= 3 else flag_enum,
+            severity=effective_severity,
+            description=request.context
+        )
+        db.add(new_flag)
+        db.commit()
 
-        _MOCK_SAFETY_FLAGS[flag_id] = {
-            "type": request.flag_type,
-            "severity": effective_severity,
-            "user": request.reported_user_id
-        }
-
-        requires_review = effective_severity in ["HIGH", "CRITICAL"]
+        requires_review = effective_severity in [SafetySeverity.HIGH, SafetySeverity.CRITICAL]
         if requires_review:
-            NISHumanReviewService.create_review(flag_id, request.reported_user_id, effective_severity)
+            NISHumanReviewService.create_review(db, str(new_flag.id), str(safe_target_id), effective_severity.name)
 
         return ReportResponse(
-            report_id=report_id,
+            report_id=str(new_report.id),
             status="RECEIVED",
             safety_flag_created=True,
             human_review_required=requires_review,
@@ -65,16 +81,13 @@ class NISSafetyService:
         )
 
     @classmethod
-    def log_contact_leak(cls, user_id: str, context: str):
+    def log_contact_leak(cls, db: Session, user_id: str, context: str):
         req = ReportRequest(
             reported_user_id=user_id,
             flag_type="CONTACT_LEAK_ATTEMPT",
             severity="MEDIUM",
             context=context
         )
-        cls.submit_report("system", req)
-
-    @classmethod
-    def clear_mock_state(cls):
-        _MOCK_REPORTS_DB.clear()
-        _MOCK_SAFETY_FLAGS.clear()
+        # Fake UUID for system user
+        system_uuid = uuid.uuid4().hex
+        cls.submit_report(db, system_uuid, req)

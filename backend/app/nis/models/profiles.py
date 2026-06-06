@@ -21,3 +21,23 @@ class NISUserSignalProfile(NISBaseModel):
     confidence_level = Column(SQLEnum(ConfidenceLevel), default=ConfidenceLevel.LOW)
     missing_signal_areas = Column(JSON, nullable=True)
     review_required = Column(Boolean, default=False)
+
+class NISNiyyahIntention(NISBaseModel):
+    __tablename__ = "nis_niyyah_intentions"
+    user_id = Column(UUID(as_uuid=True), ForeignKey("nis_users.id"), unique=True, nullable=False)
+    intention_text = Column(String, nullable=True)
+
+class NISValuesProfile(NISBaseModel):
+    __tablename__ = "nis_values_profiles"
+    user_id = Column(UUID(as_uuid=True), ForeignKey("nis_users.id"), unique=True, nullable=False)
+    values_data = Column(JSON, nullable=False, default=dict)
+
+class NISMirrorReflection(NISBaseModel):
+    __tablename__ = "nis_mirror_reflections"
+    user_id = Column(UUID(as_uuid=True), ForeignKey("nis_users.id"), unique=True, nullable=False)
+    reflection_data = Column(JSON, nullable=False, default=dict)
+
+class NISPrivatePortrait(NISBaseModel):
+    __tablename__ = "nis_private_portraits"
+    user_id = Column(UUID(as_uuid=True), ForeignKey("nis_users.id"), unique=True, nullable=False)
+    portrait_data = Column(JSON, nullable=False, default=dict)

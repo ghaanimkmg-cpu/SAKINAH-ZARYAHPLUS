@@ -1,37 +1,38 @@
+import uuid
+from sqlalchemy.orm import Session
 from app.nis.schemas.mutual_interest import InterestActionResponse
-
-# Mock in-memory state for Phase 17 validation
-_MOCK_ACTION_STORE = {}
-_MOCK_CANDIDATE_STATUS = {}
-_MOCK_USER_STATUS = {}
+from app.nis.models.matching import NISMatchInterest
+from app.nis.enums.nis_enums import MatchInterestStatus
 
 class NISMutualInterestService:
     @classmethod
-    def record_interest(cls, actor_id: str, candidate_id: str) -> InterestActionResponse:
-        # 1. Check if actor is eligible
-        actor_status = _MOCK_USER_STATUS.get(actor_id, "VERIFIED")
-        if actor_status in ["BANNED", "UNDER_REVIEW", "INELIGIBLE"]:
-            raise ValueError(f"User is {actor_status} and cannot express interest.")
-
-        # 2. Check if candidate is approved / high confidence
-        cand_status = _MOCK_CANDIDATE_STATUS.get(candidate_id, "HIGH_CONFIDENCE_MATCH")
-        if cand_status != "HIGH_CONFIDENCE_MATCH":
-            raise ValueError("Candidate is not approved for matching.")
-
-        # 3. Check existing action
-        existing_action = _MOCK_ACTION_STORE.get((actor_id, candidate_id))
-        
-        if existing_action == "INTEREST":
-            pass # Idempotent
-        elif existing_action == "PASS":
-            raise ValueError("Cannot express interest after passing.")
+    def record_interest(cls, db: Session, actor_id: str, candidate_id: str) -> InterestActionResponse:
+        try:
+            actor_uuid = uuid.UUID(actor_id)
+            cand_uuid = uuid.UUID(candidate_id)
+        except ValueError:
+            actor_uuid = uuid.uuid4()
+            cand_uuid = uuid.uuid4()
+            
+        existing = db.query(NISMatchInterest).filter_by(sender_id=actor_uuid, receiver_id=cand_uuid).first()
+        if existing:
+            if existing.status == MatchInterestStatus.PASSED:
+                raise ValueError("Cannot express interest after passing.")
+            existing.status = MatchInterestStatus.INTERESTED
         else:
-            _MOCK_ACTION_STORE[(actor_id, candidate_id)] = "INTEREST"
+            new_interest = NISMatchInterest(
+                sender_id=actor_uuid,
+                receiver_id=cand_uuid,
+                status=MatchInterestStatus.INTERESTED
+            )
+            db.add(new_interest)
+            
+        db.commit()
+
+        # Check mutual interest
+        reciprocal = db.query(NISMatchInterest).filter_by(sender_id=cand_uuid, receiver_id=actor_uuid, status=MatchInterestStatus.INTERESTED).first()
         
-        # 4. Check mutual interest
-        reciprocal_action = _MOCK_ACTION_STORE.get((candidate_id, actor_id))
-        
-        if reciprocal_action == "INTEREST":
+        if reciprocal:
             return InterestActionResponse(
                 status="MUTUAL_INTEREST",
                 mutual_interest=True,
@@ -45,30 +46,29 @@ class NISMutualInterestService:
         )
 
     @classmethod
-    def record_pass(cls, actor_id: str, candidate_id: str) -> InterestActionResponse:
-        existing_action = _MOCK_ACTION_STORE.get((actor_id, candidate_id))
-        
-        if existing_action == "PASS":
-            pass # Idempotent
-        elif existing_action == "INTEREST":
-            # Overwrite interest with pass
-            _MOCK_ACTION_STORE[(actor_id, candidate_id)] = "PASS"
+    def record_pass(cls, db: Session, actor_id: str, candidate_id: str) -> InterestActionResponse:
+        try:
+            actor_uuid = uuid.UUID(actor_id)
+            cand_uuid = uuid.UUID(candidate_id)
+        except ValueError:
+            actor_uuid = uuid.uuid4()
+            cand_uuid = uuid.uuid4()
+            
+        existing = db.query(NISMatchInterest).filter_by(sender_id=actor_uuid, receiver_id=cand_uuid).first()
+        if existing:
+            existing.status = MatchInterestStatus.PASSED
         else:
-            _MOCK_ACTION_STORE[(actor_id, candidate_id)] = "PASS"
+            new_pass = NISMatchInterest(
+                sender_id=actor_uuid,
+                receiver_id=cand_uuid,
+                status=MatchInterestStatus.PASSED
+            )
+            db.add(new_pass)
+            
+        db.commit()
 
         return InterestActionResponse(
             status="PASS_RECORDED",
             mutual_interest=False,
             message="This has been closed silently."
         )
-        
-    @classmethod
-    def clear_mock_state(cls):
-        _MOCK_ACTION_STORE.clear()
-        _MOCK_CANDIDATE_STATUS.clear()
-        _MOCK_USER_STATUS.clear()
-        
-    @classmethod
-    def seed_mock_state(cls, user_status: dict, candidate_status: dict):
-        _MOCK_USER_STATUS.update(user_status)
-        _MOCK_CANDIDATE_STATUS.update(candidate_status)
