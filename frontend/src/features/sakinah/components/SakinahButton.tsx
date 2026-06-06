@@ -27,7 +27,7 @@ export const SakinahButton: React.FC<SakinahButtonProps> = ({
     primary: "bg-[#D4A853] text-[#07090f] hover:bg-[#ebd097] focus:ring-[#D4A853]",
     secondary: "bg-transparent border border-[#D4A853] text-[#D4A853] hover:bg-[rgba(212,168,83,0.1)] focus:ring-[#D4A853]",
     danger: "bg-transparent border border-[rgba(201,138,138,0.3)] text-[#C98A8A] font-sans hover:bg-[rgba(201,138,138,0.1)] focus:ring-[#C98A8A]",
-    ghost: "bg-transparent text-[#9aa0ac] hover:text-[#EDE7DA] focus:ring-[#D4A853]"
+    ghost: "bg-transparent text-[#9aa0ac] hover:text-[#EDE7DA] hover:bg-[rgba(255,255,255,0.03)] focus:ring-[rgba(255,255,255,0.1)]"
   };
 
   const widthStyle = fullWidth ? "w-full" : "";
