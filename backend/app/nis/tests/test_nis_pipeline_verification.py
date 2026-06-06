@@ -11,7 +11,7 @@ def test_pipeline_strong_candidate_passes():
     assert len(res.candidates) == 1
     
     c = res.candidates[0]
-    assert c.candidate_user_id == "mock_candidate_1"
+    assert c.candidate_user_id == "demo_candidate_strong"
     assert c.confidence_level == "HIGH"
     assert c.photo_visible is False
 
@@ -19,13 +19,13 @@ def test_pipeline_hard_rejection_blocked():
     res = NISConsideredFewService.get_considered_few("user_test")
     # mock_candidate_blocked_age should NOT be in the results
     ids = [c.candidate_user_id for c in res.candidates]
-    assert "mock_candidate_blocked_age" not in ids
+    assert "demo_candidate_age_mismatch" not in ids
 
 def test_pipeline_weak_compatibility_blocked():
     res = NISConsideredFewService.get_considered_few("user_test")
     # mock_candidate_weak_match should NOT be in the results
     ids = [c.candidate_user_id for c in res.candidates]
-    assert "mock_candidate_weak_match" not in ids
+    assert "demo_candidate_weak" not in ids
 
 def test_pipeline_privacy_fields_not_exposed():
     res = NISConsideredFewService.get_considered_few("user_test")
@@ -50,7 +50,7 @@ def test_api_route_considered_few():
     assert len(data["candidates"]) == 1
     
     c = data["candidates"][0]
-    assert c["candidate_user_id"] == "mock_candidate_1"
+    assert c["candidate_user_id"] == "demo_candidate_strong"
     assert c["confidence_level"] == "HIGH"
     
     # Assert private fields are completely stripped

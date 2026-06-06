@@ -179,3 +179,28 @@ The API must **never** expose:
   - **Auth:** Required (Admin level pending)
   - **Body:** `{"decision": "PERMANENT_BAN"}`
   - **Response:** `{"status": "RESOLVED", "decision": "PERMANENT_BAN"}`
+
+---
+
+## 12. Development Only
+
+### Practical Proof Demo Verification
+- **GET /api/v1/nis/dev/proof-report**
+  - **Purpose:** Returns a practical, deterministic proof report showing exactly which candidates pass or fail the NIS pipeline, and why. Used for stakeholder demos.
+  - **Auth:** Disabled/Blocked outside of `development` environment. Production requests return 403 Forbidden.
+  - **Response:**
+    ```json
+    {
+      "current_user": "demo_user_ayman",
+      "nis_passed": true,
+      "results": [
+        {
+          "candidate_id": "demo_candidate_strong",
+          "expected": "SHOWN",
+          "actual": "SHOWN",
+          "reason": "Passed all checks."
+        }
+      ]
+    }
+    ```
+  - **Privacy:** No private raw data, selfies, Aadhaar info, compatibility percentages, or Barakah text is ever exposed. No Firebase logic is used.
