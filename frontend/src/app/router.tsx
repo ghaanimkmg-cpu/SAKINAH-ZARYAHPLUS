@@ -376,6 +376,10 @@ const TradingWatchlistPage = lazy(() =>
 
 // Sakinah Matchmaking Feature
 const SakinahEntryPage = lazy(() => import('@/features/sakinah/pages/SakinahEntryPage').then(m => ({ default: m.SakinahEntryPage })));
+const SakinahRolePage = lazy(() => import('@/features/sakinah/pages/SakinahRolePage').then(m => ({ default: m.SakinahRolePage })));
+const SakinahPrimerPage = lazy(() => import('@/features/sakinah/pages/SakinahPrimerPage').then(m => ({ default: m.SakinahPrimerPage })));
+const SakinahKycPage = lazy(() => import('@/features/sakinah/pages/SakinahKycPage').then(m => ({ default: m.SakinahKycPage })));
+const SakinahLivenessPage = lazy(() => import('@/features/sakinah/pages/SakinahLivenessPage').then(m => ({ default: m.SakinahLivenessPage })));
 const SakinahEligibilityPage = lazy(() => import('@/features/sakinah/pages/SakinahEligibilityPage').then(m => ({ default: m.SakinahEligibilityPage })));
 const SakinahProfileSignalsPage = lazy(() => import('@/features/sakinah/pages/SakinahProfileSignalsPage').then(m => ({ default: m.SakinahProfileSignalsPage })));
 const SakinahPreferencesPage = lazy(() => import('@/features/sakinah/pages/SakinahPreferencesPage').then(m => ({ default: m.SakinahPreferencesPage })));
@@ -807,6 +811,10 @@ export const router = createBrowserRouter([
       { path: 'trading/stock/:symbol', element: <LazyPage Component={TradingStockDetailPage} /> },
       // Sakinah Routes
       { path: 'sakinah', element: <LazyPage Component={SakinahEntryPage} /> },
+      { path: 'sakinah/role', element: <LazyPage Component={SakinahRolePage} /> },
+      { path: 'sakinah/primer', element: <LazyPage Component={SakinahPrimerPage} /> },
+      { path: 'sakinah/kyc', element: <LazyPage Component={SakinahKycPage} /> },
+      { path: 'sakinah/liveness', element: <LazyPage Component={SakinahLivenessPage} /> },
       { path: 'sakinah/eligibility', element: <LazyPage Component={SakinahEligibilityPage} /> },
       { path: 'sakinah/profile', element: <LazyPage Component={SakinahProfileSignalsPage} /> },
       { path: 'sakinah/preferences', element: <LazyPage Component={SakinahPreferencesPage} /> },
@@ -816,6 +824,8 @@ export const router = createBrowserRouter([
       { path: 'sakinah/conversation/:conversationId', element: <LazyPage Component={SakinahConversationPage} /> },
       { path: 'sakinah/decision/:matchflowId', element: <LazyPage Component={SakinahDecisionPage} /> },
       { path: 'sakinah/safety', element: <LazyPage Component={SakinahSafetyPage} /> },
+      // Added fallback for home button navigation at the end of liveness
+      { path: 'sakinah/home', element: <Navigate to="/sakinah/considered-few" replace /> },
     ],
   },
 
