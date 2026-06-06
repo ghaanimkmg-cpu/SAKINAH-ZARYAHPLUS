@@ -1,0 +1,109 @@
+import type { 
+  CandidateSummary, 
+  ConsideredFewResponse, 
+  ConversationResponse,
+  MatchflowResponse,
+  SakinahProfileData,
+  SakinahMatchPreferences
+} from '../types/sakinah.types';
+
+// Use standard API v1 path. In development it points to localhost:8000
+const API_BASE = '/api/v1/nis';
+
+/**
+ * Sakinah-specific API wrapper.
+ * Purposefully bypasses Firebase global app check/auth interceptors 
+ * as Sakinah NIS explicitly prohibits Firebase dependencies.
+ */
+async function fetchNisApi(endpoint: string, options: RequestInit = {}) {
+  // Use development placeholder auth as specified in Phase 21 docs
+  const headers = {
+    'Content-Type': 'application/json',
+    'X-Test-User-Id': 'user_frontend_dev', // Development placeholder auth
+    ...options.headers,
+  };
+
+  const response = await fetch(`${API_BASE}${endpoint}`, {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    let errorMsg = 'NIS API Error';
+    try {
+      const errorData = await response.json();
+      errorMsg = errorData.detail || errorMsg;
+    } catch {
+      // Ignored
+    }
+    throw new Error(errorMsg);
+  }
+
+  return response.json();
+}
+
+// KYC / Eligibility
+export async function getSakinahEligibility() {
+  return fetchNisApi('/eligibility/me');
+}
+
+// Profile / Preferences
+export async function getSakinahProfile(): Promise<SakinahProfileData> {
+  return fetchNisApi('/profile/me');
+}
+
+export async function updateSakinahProfile(data: Partial<SakinahProfileData>) {
+  return fetchNisApi('/profile/me', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
+export async function getSakinahPreferences(): Promise<SakinahMatchPreferences> {
+  return fetchNisApi('/preferences/me');
+}
+
+export async function updateSakinahPreferences(data: Partial<SakinahMatchPreferences>) {
+  return fetchNisApi('/preferences/me', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
+// Candidate / Interest
+export async function getConsideredFew(): Promise<ConsideredFewResponse> {
+  return fetchNisApi('/considered-few');
+}
+
+export async function expressInterest(candidateId: string) {
+  return fetchNisApi(`/candidates/${candidateId}/interest`, { method: 'POST' });
+}
+
+export async function silentPass(candidateId: string) {
+  return fetchNisApi(`/candidates/${candidateId}/pass`, { method: 'POST' });
+}
+
+// Matchflow
+export async function getMatchflow(matchflowId: string): Promise<MatchflowResponse> {
+  return fetchNisApi(`/matchflows/${matchflowId}`);
+}
+
+// Conversation
+export async function getStructuredConversation(conversationId: string): Promise<ConversationResponse> {
+  return fetchNisApi(`/conversations/${conversationId}`);
+}
+
+export async function sendConversationMessage(conversationId: string, topic: string, content: string) {
+  return fetchNisApi(`/conversations/${conversationId}/messages`, {
+    method: 'POST',
+    body: JSON.stringify({ topic, content })
+  });
+}
+
+// Reports
+export async function submitReport(reportedUserId: string, flagType: string, severity: string, context?: string) {
+  return fetchNisApi('/reports', {
+    method: 'POST',
+    body: JSON.stringify({ reported_user_id: reportedUserId, flag_type: flagType, severity, context })
+  });
+}

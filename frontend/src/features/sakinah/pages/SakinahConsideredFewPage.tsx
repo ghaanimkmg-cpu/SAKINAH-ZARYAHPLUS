@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   SakinahShell, 
   SakinahHeader, 
@@ -6,18 +6,31 @@ import {
   EmptyMatchState, 
   RayaScriptCard 
 } from '../components';
-import { mockConsideredFewResponse, mockNoMatchesResponse } from '../data/mockSakinahData';
 import { ConsideredFewResponse } from '../types/sakinah.types';
+import { getConsideredFew } from '../services/sakinahApi';
 
 export const SakinahConsideredFewPage: React.FC = () => {
-  // Using mock data. In production, this would be fetched from the backend.
-  // Switch between mockConsideredFewResponse and mockNoMatchesResponse to test states.
-  const response: ConsideredFewResponse = mockConsideredFewResponse;
+  const [response, setResponse] = useState<ConsideredFewResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getConsideredFew()
+      .then(setResponse)
+      .catch((err) => setError(err.message));
+  }, []);
 
   const handleSelectCandidate = (candidateId: string) => {
     // Navigation logic goes here eventually
     console.log(`Navigate to candidate ${candidateId}`);
   };
+
+  if (error) {
+    return <SakinahShell><div className="text-red-500">Error: {error}</div></SakinahShell>;
+  }
+
+  if (!response) {
+    return <SakinahShell><div className="p-4 text-center">Loading considered few...</div></SakinahShell>;
+  }
 
   return (
     <SakinahShell>

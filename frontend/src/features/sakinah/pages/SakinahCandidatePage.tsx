@@ -8,6 +8,7 @@ import {
   MatchflowStepper
 } from '../components';
 import { mockCandidates } from '../data/mockSakinahData';
+import { expressInterest, silentPass } from '../services/sakinahApi';
 
 export const SakinahCandidatePage: React.FC = () => {
   // Mock data usage
@@ -45,8 +46,12 @@ export const SakinahCandidatePage: React.FC = () => {
         />
 
         <InterestActionPanel 
-          onExpressInterest={() => console.log('Expressed Interest')} 
-          onSilentPass={() => console.log('Silently Passed')} 
+          onExpressInterest={() => {
+            expressInterest(candidate.id).then(() => console.log('Expressed Interest')).catch(console.error);
+          }} 
+          onSilentPass={() => {
+            silentPass(candidate.id).then(() => console.log('Silently Passed')).catch(console.error);
+          }} 
         />
       </main>
     </SakinahShell>
