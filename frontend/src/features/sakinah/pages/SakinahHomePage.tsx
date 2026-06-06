@@ -124,7 +124,7 @@ export const SakinahHomePage: React.FC = () => {
           icon="◷"
           title="Community (optional)"
           subtitle="Belonging for its own sake — never scored"
-          onClick={() => navigate('/halaqah')}
+          onClick={() => navigate('/sakinah/community')}
         />
       </div>
 
@@ -134,7 +134,7 @@ export const SakinahHomePage: React.FC = () => {
           title="Vent Box"
           subtitle="A safe ear — never used in matching"
           variant="vent"
-          onClick={() => navigate('/support')}
+          onClick={() => navigate('/sakinah/vent')}
         />
       </div>
 

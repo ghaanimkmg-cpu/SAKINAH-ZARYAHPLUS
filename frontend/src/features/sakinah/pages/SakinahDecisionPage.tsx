@@ -40,7 +40,7 @@ export const SakinahDecisionPage: React.FC = () => {
       />
 
       <div className="flex justify-center mt-6 mb-8 sk-fx sk-d1">
-        <SakinahRayaOrb state="idle" size="lg" />
+        <SakinahRayaOrb variant="hero" />
       </div>
 
       <div className="text-center mb-8 sk-fx sk-d2">
@@ -68,7 +68,7 @@ export const SakinahDecisionPage: React.FC = () => {
         
         <SakinahButton 
           variant="secondary"
-          onClick={() => handleDecision('NOT_SURE_YET')} 
+          onClick={() => handleDecision('PAUSE')} 
           disabled={isPending}
         >
           PAUSE
@@ -76,7 +76,7 @@ export const SakinahDecisionPage: React.FC = () => {
 
         <SakinahButton 
           variant="ghost"
-          onClick={() => handleDecision('SILENT_PASS')} 
+          onClick={() => handleDecision('CLOSE')} 
           disabled={isPending}
           className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
         >

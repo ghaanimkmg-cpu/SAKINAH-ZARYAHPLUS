@@ -5,8 +5,7 @@ import {
   SakinahHeader, 
   ConversationTopicList, 
   SakinahButton,
-  SakinahInput,
-  DevFallbackBadge
+  SakinahInput
 } from '../components';
 import type { ConversationTopic } from '../types/sakinah.types';
 import { sendConversationMessage } from '../services/sakinahApi';

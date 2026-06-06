@@ -50,7 +50,7 @@ export interface ConversationTopic {
   unlockRequirement?: string;
 }
 
-export type DecisionOutcome = 'PROCEED' | 'SILENT_PASS' | 'NOT_SURE_YET';
+export type DecisionOutcome = 'PROCEED' | 'PAUSE' | 'CLOSE';
 
 export interface SafetyReportPayload {
   targetUserId: string;

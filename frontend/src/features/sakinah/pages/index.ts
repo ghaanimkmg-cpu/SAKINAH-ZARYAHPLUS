@@ -17,3 +17,5 @@ export * from './SakinahMatchflowPage';
 export * from './SakinahConversationPage';
 export * from './SakinahDecisionPage';
 export * from './SakinahSafetyPage';
+export * from './SakinahCommunityPage';
+export * from './SakinahVentPage';
