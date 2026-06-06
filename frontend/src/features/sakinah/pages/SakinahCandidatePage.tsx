@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
-  SakinahShell, 
+  SakinahJourneyFrame, 
   SakinahHeader, 
   CandidatePortraitCard, 
-  InterestActionPanel, 
-  RayaScriptCard,
-  MatchflowStepper,
-  DevFallbackBadge,
-  SakinahCard
+  SakinahButton,
+  DevFallbackBadge
 } from '../components';
 import { mockCandidates } from '../data/mockSakinahData';
 import { expressInterest, silentPass } from '../services/sakinahApi';
@@ -27,12 +24,11 @@ export const SakinahCandidatePage: React.FC = () => {
     setErrorFallback('');
     try {
       await expressInterest(candidate.candidateId);
-      // Assuming mutual interest for dev flow preview
-      navigate('/sakinah/matchflow/mock_matchflow_1');
+      navigate(`/sakinah/matchflow/mock_matchflow_${candidate.candidateId}`);
     } catch (err) {
       console.warn('Backend offline, using dev fallback for expressInterest', err);
       setErrorFallback('Backend unreachable. Proceeding in Development Preview Mode.');
-      setTimeout(() => navigate('/sakinah/matchflow/mock_matchflow_1'), 1000);
+      setTimeout(() => navigate(`/sakinah/matchflow/mock_matchflow_${candidate.candidateId}`), 1000);
     } finally {
       setIsPending(false);
     }
@@ -54,44 +50,41 @@ export const SakinahCandidatePage: React.FC = () => {
   };
 
   return (
-    <SakinahShell>
-      <SakinahHeader title={candidate.displayName} subtitle="CANDIDATE PROFILE" onBack={() => navigate('/sakinah/considered-few')} />
+    <SakinahJourneyFrame>
+      <SakinahHeader 
+        title="A resonance" 
+        subtitle="Character first, never a face" 
+        onBack={() => navigate('/sakinah/considered-few')} 
+      />
 
-      <main className="mt-6 flex flex-col gap-6">
-        <MatchflowStepper currentStep="VIEWING_CANDIDATE" className="mb-2" />
+      {errorFallback && (
+        <div className="mb-4 sk-fx sk-d1">
+          <DevFallbackBadge message={errorFallback} />
+        </div>
+      )}
 
-        {errorFallback && <DevFallbackBadge message={errorFallback} />}
-
+      <div className="sk-fx sk-d1 mt-4">
         <CandidatePortraitCard candidate={candidate} />
+      </div>
 
-        <SakinahCard padding="md" className="space-y-4">
-          <div>
-            <h4 className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853] mb-2">Shared Strengths</h4>
-            <ul className="text-[13.5px] font-light text-[#EDE7DA] space-y-2 list-disc list-inside">
-              <li>Both prioritize regular daily prayers.</li>
-              <li>Aligned on timeline to marry (1 year).</li>
-              <li>Family-oriented values match.</li>
-            </ul>
-          </div>
-          <div className="border-t border-[rgba(255,255,255,0.06)] pt-4">
-            <h4 className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853] mb-2">Gentle Discussion Point</h4>
-            <p className="text-[13.5px] font-light text-[#9aa0ac]">
-              They are open to relocating, while you preferred to stay local. This might be worth exploring respectfully.
-            </p>
-          </div>
-        </SakinahCard>
-
-        <RayaScriptCard 
-          scriptText={`I noticed a strong alignment in your spiritual practices. ${candidate.displayName} also shares your deep appreciation for family.`}
-          className="my-2"
-        />
-
-        <InterestActionPanel 
-          onExpressInterest={handleExpressInterest} 
-          onSilentPass={handleSilentPass} 
-          isPending={isPending}
-        />
-      </main>
-    </SakinahShell>
+      <div className="flex gap-[11px] mt-6 sk-fx sk-d2">
+        <SakinahButton 
+          variant="ghost" 
+          disabled={isPending} 
+          onClick={handleSilentPass}
+          className="flex-1"
+        >
+          Not this one
+        </SakinahButton>
+        <SakinahButton 
+          variant="primary" 
+          disabled={isPending} 
+          onClick={handleExpressInterest}
+          className="flex-1"
+        >
+          Express interest
+        </SakinahButton>
+      </div>
+    </SakinahJourneyFrame>
   );
 };

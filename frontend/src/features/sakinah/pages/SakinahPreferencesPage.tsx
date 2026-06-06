@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SakinahShell, SakinahHeader, DevFallbackBadge, SakinahSelect, SakinahInput, SakinahButton } from '../components';
+import { 
+  SakinahJourneyFrame, 
+  DevFallbackBadge, 
+  SakinahSelect, 
+  SakinahInput, 
+  SakinahButton,
+  SakinahHeader 
+} from '../components';
 import { updateSakinahPreferences } from '../services/sakinahApi';
 
 export const SakinahPreferencesPage: React.FC = () => {
@@ -19,16 +26,15 @@ export const SakinahPreferencesPage: React.FC = () => {
     setFieldErrors({});
 
     const errors: Record<string, string> = {};
-    if (!ageMin) errors.ageMin = 'Required.';
-    if (!ageMax) errors.ageMax = 'Required.';
+    if (!ageMin) errors.ageMin = 'Required';
+    if (!ageMax) errors.ageMax = 'Required';
     if (ageMin && ageMax && parseInt(ageMin) > parseInt(ageMax)) {
       errors.ageMin = 'Min > Max';
     }
-    if (!relocation) errors.relocation = 'Please select a relocation preference.';
+    if (!relocation) errors.relocation = 'Required';
 
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
-      setErrorFallback('Please complete all required fields before continuing.');
       return;
     }
 
@@ -46,49 +52,55 @@ export const SakinahPreferencesPage: React.FC = () => {
   };
 
   return (
-    <SakinahShell>
-      <SakinahHeader title="Preferences" subtitle="MATCH ALIGNMENT" />
+    <SakinahJourneyFrame>
+      <SakinahHeader 
+        title="Your preferences" 
+        subtitle="Phase 3 · match alignment" 
+        onBack={() => navigate('/sakinah/portrait')} 
+      />
 
-      <main className="mt-6 flex flex-col gap-6">
-        <p className="text-[14px] font-light text-[#9aa0ac] leading-[1.6]">
-          Define the qualities that are essential for your marriage. We use these to gently filter candidates so you only see those who align with your core boundaries.
-        </p>
+      <p className="text-[13px] text-[var(--sk-ink-dim)] font-light leading-[1.6] mb-[14px] text-center sk-fx sk-d1">
+        Define the qualities that are essential for your marriage. We use these to gently filter candidates so you only see those who align with your core boundaries.
+      </p>
 
-        {errorFallback && <DevFallbackBadge message={errorFallback} />}
+      {errorFallback && (
+        <div className="mb-4 sk-fx sk-d1">
+          <DevFallbackBadge message={errorFallback} />
+        </div>
+      )}
 
-        <form className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 items-start" onSubmit={handleSubmit} noValidate>
-          <div className="space-y-2">
-            <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853] flex items-center gap-2">
-              Age Range Preference
-              <span className="text-[#D4A853]/60">*</span>
-            </label>
-            <div className="flex gap-4">
-              <SakinahInput 
-                type="number" 
-                placeholder="Min"
-                className="flex-1"
-                value={ageMin}
-                onChange={(e) => { setAgeMin(e.target.value); setFieldErrors(prev => ({...prev, ageMin: ''})); }}
-                required
-                error={fieldErrors.ageMin}
-              />
-              <SakinahInput 
-                type="number" 
-                placeholder="Max"
-                className="flex-1"
-                value={ageMax}
-                onChange={(e) => { setAgeMax(e.target.value); setFieldErrors(prev => ({...prev, ageMax: ''})); }}
-                required
-                error={fieldErrors.ageMax}
-              />
-            </div>
+      <form className="mt-4 flex flex-col gap-[22px] sk-fx sk-d2" onSubmit={handleSubmit} noValidate>
+        
+        <div className="bg-[rgba(212,168,83,0.02)] border border-[rgba(212,168,83,0.15)] rounded-[13px] p-[16px]">
+          <label className="block font-serif text-[16px] text-[var(--sk-gold)] mb-3">Age Range Preference</label>
+          <div className="flex gap-[11px]">
+            <SakinahInput 
+              type="number" 
+              placeholder="Min Age"
+              className="flex-1"
+              value={ageMin}
+              onChange={(e) => { setAgeMin(e.target.value); setFieldErrors(prev => ({...prev, ageMin: ''})); }}
+              required
+              error={fieldErrors.ageMin}
+            />
+            <SakinahInput 
+              type="number" 
+              placeholder="Max Age"
+              className="flex-1"
+              value={ageMax}
+              onChange={(e) => { setAgeMax(e.target.value); setFieldErrors(prev => ({...prev, ageMax: ''})); }}
+              required
+              error={fieldErrors.ageMax}
+            />
           </div>
+        </div>
 
+        <div className="bg-[rgba(212,168,83,0.02)] border border-[rgba(212,168,83,0.15)] rounded-[13px] p-[16px]">
+          <label className="block font-serif text-[16px] text-[var(--sk-gold)] mb-3">Willingness to Relocate</label>
           <SakinahSelect
-            label="Willingness to Relocate"
             value={relocation}
             onChange={(e) => { setRelocation(e.target.value); setFieldErrors(prev => ({...prev, relocation: ''})); }}
-            placeholder="Choose an option"
+            placeholder="Select your stance"
             required
             error={fieldErrors.relocation}
             options={[
@@ -97,36 +109,18 @@ export const SakinahPreferencesPage: React.FC = () => {
               { value: 'flexible', label: "Flexible / Let's discuss" },
             ]}
           />
+        </div>
 
-          <div className="space-y-2 pt-4 md:col-span-2">
-            <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#C98A8A]">Non-Negotiable Boundaries</label>
-            <p className="text-[12px] text-[#5f6675] mb-3">
-              Check the boundaries that are absolute requirements for you.
-            </p>
-            <div className="flex flex-col gap-3">
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" className="w-5 h-5 accent-[#D4A853] bg-[#111826] border-[rgba(255,255,255,0.06)] rounded-[4px]" />
-                <span className="text-[14px] text-[#EDE7DA] font-light group-hover:text-[#D4A853] transition-colors">Must pray regularly</span>
-              </label>
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" className="w-5 h-5 accent-[#D4A853] bg-[#111826] border-[rgba(255,255,255,0.06)] rounded-[4px]" />
-                <span className="text-[14px] text-[#EDE7DA] font-light group-hover:text-[#D4A853] transition-colors">Must not smoke</span>
-              </label>
-            </div>
-          </div>
-
-          <div className="md:col-span-2">
-            <SakinahButton 
-              type="submit" 
-              disabled={isPending}
-              size="lg"
-              className="mt-4"
-            >
-              {isPending ? 'Saving...' : 'Save Preferences'}
-            </SakinahButton>
-          </div>
-        </form>
-      </main>
-    </SakinahShell>
+        <div className="sk-fx sk-d3 mt-[11px]">
+          <SakinahButton 
+            type="submit" 
+            variant="primary"
+            disabled={isPending}
+          >
+            {isPending ? 'Saving...' : 'Save and View Candidates →'}
+          </SakinahButton>
+        </div>
+      </form>
+    </SakinahJourneyFrame>
   );
 };

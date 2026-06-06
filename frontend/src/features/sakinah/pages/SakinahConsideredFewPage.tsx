@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  SakinahShell, 
+  SakinahJourneyFrame, 
   SakinahHeader, 
   ConsideredFewList, 
   EmptyMatchState, 
-  RayaScriptCard,
   DevFallbackBadge,
   SakinahLoadingState
 } from '../components';
@@ -33,30 +32,48 @@ export const SakinahConsideredFewPage: React.FC = () => {
   };
 
   if (!response) {
-    return <SakinahLoadingState fullPage message="Aligning compatible candidates..." />;
+    return (
+      <SakinahJourneyFrame>
+        <SakinahLoadingState fullPage message="Aligning compatible candidates..." />
+      </SakinahJourneyFrame>
+    );
   }
 
   return (
-    <SakinahShell>
-      <SakinahHeader title="Considered Few" subtitle="ALIGNED CANDIDATES" />
+    <SakinahJourneyFrame>
+      <SakinahHeader 
+        title="Your considered few" 
+        subtitle="Phase 4 · curated, never a feed" 
+        onBack={() => navigate('/sakinah/home')} 
+      />
 
-      <main className="mt-6 flex flex-col gap-6">
-        <RayaScriptCard 
-          scriptText="I have reviewed your signals alongside others. Rather than showing you many incompatible profiles, I have brought forward only those who share your core values. Take your time."
-          className="mb-2"
-        />
+      {isOfflineFallback && (
+        <div className="mb-4 sk-fx sk-d1">
+          <DevFallbackBadge message="Development Preview Mode: Backend offline, using safe mock candidates." />
+        </div>
+      )}
 
-        {isOfflineFallback && <DevFallbackBadge />}
-
-        {response.status === 'NO_SUITABLE_MATCHES_RIGHT_NOW' || !response.candidates || response.candidates.length === 0 ? (
+      {response.status === 'NO_SUITABLE_MATCHES_RIGHT_NOW' || !response.candidates || response.candidates.length === 0 ? (
+        <div className="mt-6 sk-fx sk-d2">
           <EmptyMatchState />
-        ) : (
+        </div>
+      ) : (
+        <>
+          <div className="sk-active-banner sk-fx sk-d1 mb-[14px]">
+            A handful to reflect on — not an endless scroll. Pass on one, the next takes its place. You may <b className="font-medium text-[var(--sk-gold)]">actively pursue only one or two</b>.
+          </div>
+
           <ConsideredFewList 
             candidates={response.candidates} 
             onSelectCandidate={handleSelectCandidate} 
+            className="mb-[24px]"
           />
-        )}
-      </main>
-    </SakinahShell>
+          
+          <div className="sk-insight sk-fx sk-d4" style={{ borderColor: 'var(--sk-green)', color: '#bcd6b8' }}>
+            In a thin week you'll see fewer — and we'll say so honestly. <em className="italic text-[var(--sk-gold-soft)]">"We'd rather show you no one than the wrong one."</em>
+          </div>
+        </>
+      )}
+    </SakinahJourneyFrame>
   );
 };

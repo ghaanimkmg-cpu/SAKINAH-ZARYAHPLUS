@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { SakinahShell, SakinahHeader, MatchflowStepper, RayaScriptCard, DevFallbackBadge, SakinahCard, SakinahButton, SakinahLoadingState } from '../components';
+import { 
+  SakinahJourneyFrame, 
+  SakinahHeader, 
+  MatchflowStepper, 
+  DevFallbackBadge, 
+  SakinahButton, 
+  SakinahLoadingState 
+} from '../components';
 import { getMatchflow } from '../services/sakinahApi';
 import type { MatchflowResponse } from '../types/sakinah.types';
 
@@ -27,44 +34,47 @@ export const SakinahMatchflowPage: React.FC = () => {
   }, [matchflowId]);
 
   if (!matchflow) {
-    return <SakinahLoadingState fullPage message="Loading journey details..." />;
+    return (
+      <SakinahJourneyFrame>
+        <SakinahLoadingState fullPage message="Loading journey details..." />
+      </SakinahJourneyFrame>
+    );
   }
 
-  const isConversationOpen = matchflow.current_step === 'CONVERSATION_OPEN';
+  const isConversationOpen = matchflow.current_step === 'CONVERSATION_OPEN' || matchflow.current_step === 'DECISION_PENDING';
 
   return (
-    <SakinahShell>
-      <SakinahHeader title="Match Journey" subtitle="CURRENT STATUS" onBack={() => navigate('/sakinah/considered-few')} />
+    <SakinahJourneyFrame>
+      <SakinahHeader 
+        title="Match flow" 
+        subtitle="Phase 5 · a structured opening" 
+        onBack={() => navigate('/sakinah/considered-few')} 
+      />
 
-      <main className="mt-6 flex flex-col gap-6">
-        <RayaScriptCard 
-          scriptText={isConversationOpen ? "The conversation is now open. Approach it with honesty and respect." : "The journey to nikah is deliberate. We are currently waiting for mutual alignment before proceeding further. Take your time to reflect."}
-          className="mb-2"
-        />
+      {isOfflineFallback && (
+        <div className="mb-4 sk-fx sk-d1">
+          <DevFallbackBadge message="Development Preview Mode: Backend unreachable. Proceeding with CONVERSATION_OPEN state." />
+        </div>
+      )}
 
-        {isOfflineFallback && <DevFallbackBadge message="Backend unreachable. Proceeding with CONVERSATION_OPEN state." />}
+      <div className="sk-conv-banner sk-fx sk-d1 mb-4">
+        Interest is private. A decline is silent — never rejection. Only a mutual yes opens a conversation.
+      </div>
 
-        <SakinahCard padding="md">
-          <h3 className="font-serif text-[21px] text-[#EDE7DA] mb-2">Current Phase</h3>
-          <p className="text-[14px] font-light text-[#9aa0ac] leading-[1.6]">
-            {isConversationOpen 
-              ? "Mutual interest confirmed. A structured conversation is now open." 
-              : "Mutual Interest is pending. Both parties must quietly express interest before any conversation opens."}
-          </p>
-          <MatchflowStepper currentStep={matchflow.current_step as any} />
-        </SakinahCard>
-        
-        {isConversationOpen && (
+      <div className="sk-fx sk-d2">
+        <MatchflowStepper currentStep={matchflow.current_step} />
+      </div>
+      
+      {isConversationOpen && (
+        <div className="sk-fx sk-d3 mt-5">
           <SakinahButton 
+            variant="primary"
             onClick={() => navigate('/sakinah/conversation/mock_conversation_1')}
-            size="lg"
-            className="mt-4"
           >
-            Enter Conversation
+            Mutual yes — open conversation →
           </SakinahButton>
-        )}
-
-      </main>
-    </SakinahShell>
+        </div>
+      )}
+    </SakinahJourneyFrame>
   );
 };

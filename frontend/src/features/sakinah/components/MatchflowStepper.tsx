@@ -3,35 +3,54 @@ import type { MatchflowStep } from '../types/sakinah.types';
 
 interface MatchflowStepperProps {
   currentStep: MatchflowStep;
+  candidateName?: string;
   className?: string;
 }
 
-export const MatchflowStepper: React.FC<MatchflowStepperProps> = ({ currentStep, className = '' }) => {
-  const steps: { key: MatchflowStep; label: string; desc: string }[] = [
-    { key: 'VIEWING_CANDIDATE', label: 'View Profile', desc: 'Read their signals safely.' },
-    { key: 'MUTUAL_INTEREST_PENDING', label: 'Mutual Interest', desc: 'Awaiting alignment.' },
-    { key: 'CONVERSATION_OPEN', label: 'Structured Chat', desc: 'Unlock topics progressively.' },
-    { key: 'DECISION_PENDING', label: 'Final Decision', desc: 'Proceed or part ways.' }
+export const MatchflowStepper: React.FC<MatchflowStepperProps> = ({ currentStep, candidateName = 'them', className = '' }) => {
+  let activeIndex = 0;
+  switch (currentStep) {
+    case 'VIEWING_CANDIDATE':
+      activeIndex = 2; // "Mutual interest" pending
+      break;
+    case 'MUTUAL_INTEREST_PENDING':
+      activeIndex = 2;
+      break;
+    case 'CONVERSATION_OPEN':
+      activeIndex = 3; // Or 4/5 depending on progress, we'll map to 3 for now
+      break;
+    case 'DECISION_PENDING':
+      activeIndex = 5;
+      break;
+    default:
+      activeIndex = 2;
+  }
+
+  const steps = [
+    { num: '٠', title: 'Both profiles complete', desc: 'Intentions, values, tradition, character & verified identity.' },
+    { num: '١', title: 'Compatibility identified', desc: 'Curated from values, conduct & shared tradition — never searched.' },
+    { num: '٢', title: 'Mutual interest', desc: `You expressed interest. Awaiting ${candidateName} — a silent decline stays dignified.` },
+    { num: '٣', title: 'Structured opening', desc: 'Raya frames the first exchange — no blank chat box.' },
+    { num: '٤', title: 'Family / wali invited', desc: 'Either may bring a wali — configurable, women-centric.' },
+    { num: '٥', title: 'Supervised depth → decision', desc: 'The eight pre-nikah topics open progressively.' },
   ];
 
-  const currentIndex = steps.findIndex(s => s.key === currentStep);
-
   return (
-    <div className={`mt-[26px] ${className}`}>
+    <div className={`sk-card p-[16px] ${className}`}>
       {steps.map((step, index) => {
-        const isActive = index <= currentIndex;
+        const isDone = index < activeIndex;
+        const isCur = index === activeIndex;
+        let itemClass = 'mf';
+        if (isDone) itemClass += ' done';
+        if (isCur) itemClass += ' cur';
+
         return (
-          <div key={step.key} className={`flex gap-[12px] items-start p-[9px_11px] rounded-[11px] transition-[0.18s] mb-[3px] ${isActive ? 'bg-[rgba(212,168,83,0.08)] shadow-[inset_0_0_0_1px_rgba(212,168,83,0.16)]' : 'hover:bg-[rgba(212,168,83,0.05)]'}`}>
-            <div className={`w-[22px] h-[22px] rounded-[6px] border flex items-center justify-center font-mono text-[10px] shrink-0 mt-[1px] ${isActive ? 'bg-[#D4A853] text-[#0a0e15] border-[#D4A853]' : 'border-[rgba(212,168,83,0.16)] text-[#5f6675]'}`}>
-              {index + 1}
-            </div>
+          <div key={index} className={itemClass}>
+            <div className="mn">{step.num}</div>
             <div>
-              <div className={`text-[13.5px] font-medium leading-[1.25] ${isActive ? 'text-[#e7c984]' : 'text-[#9aa0ac]'}`}>
-                {step.label}
-              </div>
-              <div className="text-[11px] text-[#5f6675] font-light mt-[2px] leading-[1.3]">
-                {step.desc}
-              </div>
+              <b>{step.title}</b>
+              <p>{step.desc}</p>
+              {isCur && <span className="cur-tag">● you are here</span>}
             </div>
           </div>
         );

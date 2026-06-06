@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { SakinahShell, SakinahHeader, DevFallbackBadge, SakinahButton } from '../components';
+import { 
+  SakinahJourneyFrame, 
+  SakinahHeader, 
+  DevFallbackBadge, 
+  SakinahButton,
+  SakinahRayaOrb
+} from '../components';
 import { submitDecision } from '../services/sakinahApi';
 import type { DecisionOutcome } from '../types/sakinah.types';
 
@@ -26,53 +32,61 @@ export const SakinahDecisionPage: React.FC = () => {
   };
 
   return (
-    <SakinahShell>
-      <SakinahHeader title="Final Choice" subtitle="DECISION PENDING" onBack={() => window.history.back()} />
+    <SakinahJourneyFrame>
+      <SakinahHeader 
+        title="The decision" 
+        subtitle="Phase 7 · guided by Raya" 
+        onBack={() => window.history.back()} 
+      />
 
-      <main className="mt-6 flex flex-col gap-6 text-center">
-        <div className="relative w-[80px] h-[80px] mx-auto rounded-full border border-[rgba(212,168,83,0.16)] flex items-center justify-center mb-2 shadow-[0_0_20px_rgba(212,168,83,0.05)]">
-          <div className="absolute inset-0 bg-[#D4A853] rounded-full opacity-5"></div>
-          <span className="font-serif text-[32px] text-[#D4A853]">⚖️</span>
-        </div>
+      <div className="flex justify-center mt-6 mb-8 sk-fx sk-d1">
+        <SakinahRayaOrb state="idle" size="lg" />
+      </div>
 
-        <h2 className="font-serif text-[26px] font-medium text-[#EDE7DA]">
-          It is time to decide.
-        </h2>
-        
-        <p className="text-[14px] font-light text-[#9aa0ac] leading-[1.6]">
-          You have completed the structured conversation. How would you like to proceed? Make this choice with sincerity and intention. No one will pressure you.
+      <div className="text-center mb-8 sk-fx sk-d2">
+        <p className="text-[14px] font-light text-[var(--sk-ink-dim)] leading-[1.6]">
+          You have completed the structured conversation. How would you like to proceed?
+          <br /><br />
+          Take your time. Make this choice with sincerity and intention. No one will pressure you.
         </p>
+      </div>
 
-        {errorFallback && <DevFallbackBadge message={errorFallback} />}
-
-        <div className="mt-8 flex flex-col gap-4">
-          <SakinahButton 
-            onClick={() => handleDecision('PROCEED')}
-            disabled={isPending}
-            size="lg"
-          >
-            PROCEED
-          </SakinahButton>
-          
-          <SakinahButton 
-            variant="secondary"
-            onClick={() => handleDecision('NOT_SURE_YET')} 
-            disabled={isPending}
-            size="lg"
-          >
-            PAUSE
-          </SakinahButton>
-
-          <SakinahButton 
-            variant="danger"
-            onClick={() => handleDecision('SILENT_PASS')} 
-            disabled={isPending}
-            size="lg"
-          >
-            CLOSE
-          </SakinahButton>
+      {errorFallback && (
+        <div className="mb-4 sk-fx sk-d2">
+          <DevFallbackBadge message={errorFallback} />
         </div>
-      </main>
-    </SakinahShell>
+      )}
+
+      <div className="flex flex-col gap-4 mt-8 sk-fx sk-d3">
+        <SakinahButton 
+          variant="primary"
+          onClick={() => handleDecision('PROCEED')}
+          disabled={isPending}
+        >
+          PROCEED
+        </SakinahButton>
+        
+        <SakinahButton 
+          variant="secondary"
+          onClick={() => handleDecision('NOT_SURE_YET')} 
+          disabled={isPending}
+        >
+          PAUSE
+        </SakinahButton>
+
+        <SakinahButton 
+          variant="ghost"
+          onClick={() => handleDecision('SILENT_PASS')} 
+          disabled={isPending}
+          className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+        >
+          CLOSE
+        </SakinahButton>
+      </div>
+      
+      <div className="sk-insight mt-6 sk-fx sk-d4 border-none bg-transparent">
+        Raya does not decide for you. True compatibility is found in your shared effort.
+      </div>
+    </SakinahJourneyFrame>
   );
 };
