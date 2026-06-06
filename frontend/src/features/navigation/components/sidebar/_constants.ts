@@ -79,6 +79,7 @@ export const ICON_COLOR_MAP: Record<string, string> = {
   messages: '#D4A853',
   network: '#22C55E',
   matrimony: '#E84393',
+  sakinah: '#E84393',
   'halal-intimacy': '#E84393',
   events: '#5BB6C8',
   commerce: '#5BB6C8',
