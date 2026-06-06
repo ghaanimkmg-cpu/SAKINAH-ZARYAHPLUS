@@ -117,3 +117,8 @@ export async function submitReport(reportedUserId: string, flagType: string, sev
     body: JSON.stringify({ reported_user_id: reportedUserId, flag_type: flagType, severity, context })
   });
 }
+
+// Development Proof
+export async function getNisProofReport() {
+  return fetchNisApi('/dev/proof-report');
+}

@@ -396,6 +396,7 @@ const SakinahDecisionPage = lazy(() => import('@/features/sakinah/pages/SakinahD
 const SakinahSafetyPage = lazy(() => import('@/features/sakinah/pages/SakinahSafetyPage').then(m => ({ default: m.SakinahSafetyPage })));
 const SakinahCommunityPage = lazy(() => import('@/features/sakinah/pages/SakinahCommunityPage').then(m => ({ default: m.SakinahCommunityPage })));
 const SakinahVentPage = lazy(() => import('@/features/sakinah/pages/SakinahVentPage').then(m => ({ default: m.SakinahVentPage })));
+const SakinahNisProofPage = lazy(() => import('@/features/sakinah/pages/SakinahNisProofPage').then(m => ({ default: m.SakinahNisProofPage })));
 
 
 // AEBCD onboarding — Stage A marketing landing at /welcome.
@@ -838,6 +839,7 @@ export const router = createBrowserRouter([
       { path: 'sakinah/safety', element: <LazyPage Component={SakinahSafetyPage} /> },
       { path: 'sakinah/community', element: <LazyPage Component={SakinahCommunityPage} /> },
       { path: 'sakinah/vent', element: <LazyPage Component={SakinahVentPage} /> },
+      { path: 'sakinah/dev/proof-report', element: <LazyPage Component={SakinahNisProofPage} /> },
     ],
   },
 

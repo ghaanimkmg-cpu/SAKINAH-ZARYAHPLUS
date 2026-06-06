@@ -73,7 +73,8 @@ When demonstrating this to Omar, emphasize that:
 
 **Step 1:** Run the backend and frontend. (Using `npm run dev` and `start.bat` or your local equivalents).
 **Step 2:** Open backend health: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health) to prove the server is running.
-**Step 3:** Open proof report: [http://127.0.0.1:8000/api/v1/nis/dev/proof-report](http://127.0.0.1:8000/api/v1/nis/dev/proof-report).
-**Step 4:** Show Omar the JSON payload on screen. Point out that `nis_passed` is `true`, and read through the `results` array. Show that out of 6 candidates, only `demo_candidate_strong` was allowed through. The others were systematically blocked by the backend pipeline for age, anger, bans, or weak compatibility.
-**Step 5:** Open Sakinah frontend: [http://localhost:5173/sakinah](http://localhost:5173/sakinah) and navigate to the Considered Few page.
-**Step 6:** Explain that the frontend only displays what the backend approved (`demo_candidate_strong`). The frontend is making no decisions, ensuring absolute safety and backend authority.
+**Step 3:** Open the human-readable proof report UI on the frontend: [http://localhost:5173/sakinah/dev/proof-report](http://localhost:5173/sakinah/dev/proof-report).
+(Do NOT show the raw JSON `/api/v1/nis/dev/proof-report` to Omar as it is not easily readable).
+**Step 4:** Show Omar the premium UI. Point out that the status is `PASSED`, and walk through the candidates. Show that out of 6 candidates, only `Strong Candidate` was allowed through. The others were systematically blocked by the backend pipeline for age, anger, bans, or weak compatibility. Read out the human-friendly reasons.
+**Step 5:** Navigate to the Considered Few page: [http://localhost:5173/sakinah](http://localhost:5173/sakinah) -> Considered Few.
+**Step 6:** Explain that the frontend only displays what the backend approved. The frontend is making no decisions, ensuring absolute safety and backend authority.

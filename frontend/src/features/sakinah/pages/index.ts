@@ -19,3 +19,4 @@ export * from './SakinahDecisionPage';
 export * from './SakinahSafetyPage';
 export * from './SakinahCommunityPage';
 export * from './SakinahVentPage';
+export * from './SakinahNisProofPage';
