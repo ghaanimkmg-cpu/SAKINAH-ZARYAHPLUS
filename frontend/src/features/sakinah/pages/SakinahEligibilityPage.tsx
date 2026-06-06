@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SakinahShell, SakinahHeader, SafetyNotice, DevFallbackBadge } from '../components';
+import { SakinahShell, SakinahHeader, SafetyNotice, DevFallbackBadge, SakinahButton, SakinahCard, SakinahLoadingState } from '../components';
 import { getSakinahEligibility } from '../services/sakinahApi';
 
 type EligibilityState = 'NOT_STARTED' | 'PENDING' | 'VERIFIED' | 'HUMAN_REVIEW_REQUIRED' | 'REJECTED' | 'BANNED';
 
 export const SakinahEligibilityPage: React.FC = () => {
-  const [status, setStatus] = useState<EligibilityState>('PENDING');
+  const [status, setStatus] = useState<EligibilityState | null>(null);
   const [isOfflineFallback, setIsOfflineFallback] = useState(false);
   const navigate = useNavigate();
 
@@ -21,6 +21,10 @@ export const SakinahEligibilityPage: React.FC = () => {
         setStatus('VERIFIED');
       });
   }, []);
+
+  if (!status) {
+    return <SakinahLoadingState fullPage message="Verifying security status..." />;
+  }
 
   return (
     <SakinahShell>
@@ -37,7 +41,7 @@ export const SakinahEligibilityPage: React.FC = () => {
 
         {isOfflineFallback && <DevFallbackBadge />}
 
-        <div className="border border-[rgba(212,168,83,0.16)] bg-gradient-to-br from-[#111826] to-[#0f1521] rounded-[22px] p-6 mt-4">
+        <SakinahCard className="mt-4 bg-gradient-to-br from-[#111826] to-[#0f1521]">
           <h3 className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#D4A853] mb-4">
             Current Status
           </h3>
@@ -59,19 +63,20 @@ export const SakinahEligibilityPage: React.FC = () => {
             {status === 'REJECTED' && "We are unable to verify your profile at this time."}
             {status === 'BANNED' && "You have been permanently removed from Sakinah."}
           </p>
-        </div>
+        </SakinahCard>
 
         {status === 'HUMAN_REVIEW_REQUIRED' && (
           <SafetyNotice message="Our trust and safety team will review your account details to ensure community standards are upheld." />
         )}
 
         {status === 'VERIFIED' && (
-          <button 
+          <SakinahButton 
             onClick={() => navigate('/sakinah/profile')}
-            className="w-full py-[16px] rounded-[14px] bg-[#D4A853] text-[#07090f] font-serif font-medium text-[20px] transition-opacity hover:opacity-90 mt-4"
+            size="lg"
+            className="mt-4"
           >
             Continue
-          </button>
+          </SakinahButton>
         )}
 
       </main>

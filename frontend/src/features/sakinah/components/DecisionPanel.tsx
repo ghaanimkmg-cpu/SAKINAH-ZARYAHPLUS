@@ -1,4 +1,5 @@
 import React from 'react';
+import { SakinahButton } from './SakinahButton';
 
 interface DecisionPanelProps {
   onProceed: () => void;
@@ -15,20 +16,20 @@ export const DecisionPanel: React.FC<DecisionPanelProps> = ({ onProceed, onPartW
           Make your choice with intention. Once a decision is made, it cannot be reversed.
         </p>
       </div>
-      <button 
+      <SakinahButton 
         onClick={onProceed}
         disabled={isPending}
-        className="w-full py-[16px] rounded-[14px] bg-[#D4A853] text-[#07090f] font-serif font-medium text-[20px] transition-opacity disabled:opacity-50 hover:opacity-90"
+        size="lg"
       >
         {isPending ? 'Processing...' : 'Proceed to Next Phase'}
-      </button>
-      <button 
+      </SakinahButton>
+      <SakinahButton 
+        variant="danger"
         onClick={onPartWays}
         disabled={isPending}
-        className="w-full py-[14px] rounded-[14px] border border-[rgba(255,255,255,0.1)] text-[#C98A8A] font-sans text-[14px] font-medium transition-colors hover:bg-[rgba(201,138,138,0.1)] hover:border-[rgba(201,138,138,0.3)] disabled:opacity-50"
       >
         Part Ways Respectfully
-      </button>
+      </SakinahButton>
     </div>
   );
 };

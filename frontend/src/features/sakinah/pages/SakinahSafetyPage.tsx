@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SakinahShell, SakinahHeader, SafetyNotice, DevFallbackBadge } from '../components';
+import { SakinahShell, SakinahHeader, SafetyNotice, DevFallbackBadge, SakinahCard, SakinahButton } from '../components';
 import { submitReport } from '../services/sakinahApi';
 
 export const SakinahSafetyPage: React.FC = () => {
@@ -36,19 +36,19 @@ export const SakinahSafetyPage: React.FC = () => {
         <div className="space-y-6">
           <SafetyNotice message="Sakinah is monitored for your safety. Report any inappropriate behavior, pressure, or requests for money immediately." />
 
-          <div className="bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[22px] p-5">
+          <SakinahCard padding="md">
             <h3 className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853] mb-3">Privacy & Communication</h3>
             <p className="text-[13.5px] font-light text-[#9aa0ac] leading-[1.6]">
               Never share your private phone number, home address, or financial information. Keep all communication inside Sakinah until both parties, and their families, have agreed to proceed towards nikah.
             </p>
-          </div>
+          </SakinahCard>
 
-          <div className="bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[22px] p-5">
+          <SakinahCard padding="md">
             <h3 className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853] mb-3">Wali / Family Support</h3>
             <p className="text-[13.5px] font-light text-[#9aa0ac] leading-[1.6]">
               We strongly encourage involving your wali or trusted family members early in the process. True alignment respects family bonds.
             </p>
-          </div>
+          </SakinahCard>
           
           {reportStatus === 'SUCCESS' && (
             <div className="bg-green-500/10 border border-green-500/30 rounded-[12px] p-3 text-center text-[12px] text-green-400">
@@ -58,13 +58,14 @@ export const SakinahSafetyPage: React.FC = () => {
 
           {reportStatus === 'FALLBACK' && <DevFallbackBadge message="Backend unreachable. Report mock processed." />}
 
-          <button 
+          <SakinahButton 
+            variant="danger"
             onClick={handleReport}
             disabled={isPending}
-            className="w-full py-[14px] mt-4 rounded-[14px] border border-[rgba(201,138,138,0.3)] text-[#C98A8A] font-sans text-[14px] font-medium transition-colors hover:bg-[rgba(201,138,138,0.1)] disabled:opacity-50"
+            className="mt-4"
           >
             {isPending ? 'Submitting...' : 'Report an Incident'}
-          </button>
+          </SakinahButton>
         </div>
       </main>
     </SakinahShell>

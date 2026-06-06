@@ -7,7 +7,8 @@ import {
   InterestActionPanel, 
   RayaScriptCard,
   MatchflowStepper,
-  DevFallbackBadge
+  DevFallbackBadge,
+  SakinahCard
 } from '../components';
 import { mockCandidates } from '../data/mockSakinahData';
 import { expressInterest, silentPass } from '../services/sakinahApi';
@@ -63,7 +64,7 @@ export const SakinahCandidatePage: React.FC = () => {
 
         <CandidatePortraitCard candidate={candidate} />
 
-        <div className="bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[22px] p-5 space-y-4">
+        <SakinahCard padding="md" className="space-y-4">
           <div>
             <h4 className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853] mb-2">Shared Strengths</h4>
             <ul className="text-[13.5px] font-light text-[#EDE7DA] space-y-2 list-disc list-inside">
@@ -78,7 +79,7 @@ export const SakinahCandidatePage: React.FC = () => {
               They are open to relocating, while you preferred to stay local. This might be worth exploring respectfully.
             </p>
           </div>
-        </div>
+        </SakinahCard>
 
         <RayaScriptCard 
           scriptText={`I noticed a strong alignment in your spiritual practices. ${candidate.displayName} also shares your deep appreciation for family.`}
@@ -88,6 +89,7 @@ export const SakinahCandidatePage: React.FC = () => {
         <InterestActionPanel 
           onExpressInterest={handleExpressInterest} 
           onSilentPass={handleSilentPass} 
+          isPending={isPending}
         />
       </main>
     </SakinahShell>

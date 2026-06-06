@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SakinahShell, SakinahHeader, DevFallbackBadge, SakinahSelect } from '../components';
+import { SakinahShell, SakinahHeader, DevFallbackBadge, SakinahSelect, SakinahTextarea, SakinahButton } from '../components';
 import { updateSakinahProfile } from '../services/sakinahApi';
 
 export const SakinahProfileSignalsPage: React.FC = () => {
@@ -88,23 +88,22 @@ export const SakinahProfileSignalsPage: React.FC = () => {
             ]}
           />
 
-          <div className="space-y-2 md:col-span-2">
-            <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853]">A short note about your journey</label>
-            <textarea 
-              rows={4}
-              placeholder="What are you looking to build together?"
-              className="w-full bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 text-[#EDE7DA] text-[14px] font-light resize-none focus:outline-none focus:border-[#D4A853]"
-            />
-          </div>
+          <SakinahTextarea
+            label="A short note about your journey"
+            rows={4}
+            placeholder="What are you looking to build together?"
+            className="md:col-span-2"
+          />
 
           <div className="md:col-span-2">
-            <button 
+            <SakinahButton 
               type="submit" 
               disabled={isPending}
-              className="w-full py-[16px] rounded-[14px] bg-[#D4A853] text-[#07090f] font-serif font-medium text-[18px] transition-opacity mt-4 hover:opacity-90 disabled:opacity-50"
+              size="lg"
+              className="mt-4"
             >
               {isPending ? 'Saving...' : 'Save Signals'}
-            </button>
+            </SakinahButton>
           </div>
         </form>
       </main>

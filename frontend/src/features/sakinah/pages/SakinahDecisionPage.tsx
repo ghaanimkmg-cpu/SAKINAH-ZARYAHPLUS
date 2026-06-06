@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { SakinahShell, SakinahHeader, DevFallbackBadge } from '../components';
+import { SakinahShell, SakinahHeader, DevFallbackBadge, SakinahButton } from '../components';
 import { submitDecision } from '../services/sakinahApi';
 import type { DecisionOutcome } from '../types/sakinah.types';
 
@@ -30,7 +30,8 @@ export const SakinahDecisionPage: React.FC = () => {
       <SakinahHeader title="Final Choice" subtitle="DECISION PENDING" onBack={() => window.history.back()} />
 
       <main className="mt-6 flex flex-col gap-6 text-center">
-        <div className="w-[80px] h-[80px] mx-auto rounded-full border border-[rgba(212,168,83,0.16)] flex items-center justify-center mb-2">
+        <div className="relative w-[80px] h-[80px] mx-auto rounded-full border border-[rgba(212,168,83,0.16)] flex items-center justify-center mb-2 shadow-[0_0_20px_rgba(212,168,83,0.05)]">
+          <div className="absolute inset-0 bg-[#D4A853] rounded-full opacity-5"></div>
           <span className="font-serif text-[32px] text-[#D4A853]">⚖️</span>
         </div>
 
@@ -45,29 +46,31 @@ export const SakinahDecisionPage: React.FC = () => {
         {errorFallback && <DevFallbackBadge message={errorFallback} />}
 
         <div className="mt-8 flex flex-col gap-4">
-          <button 
+          <SakinahButton 
             onClick={() => handleDecision('PROCEED')}
             disabled={isPending}
-            className="w-full py-[16px] rounded-[14px] bg-[#D4A853] text-[#07090f] font-serif font-medium text-[20px] transition-opacity hover:opacity-90 disabled:opacity-50"
+            size="lg"
           >
             PROCEED
-          </button>
+          </SakinahButton>
           
-          <button 
-            onClick={() => handleDecision('NOT_SURE_YET')} // Note: the type says NOT_SURE_YET for pause
+          <SakinahButton 
+            variant="secondary"
+            onClick={() => handleDecision('NOT_SURE_YET')} 
             disabled={isPending}
-            className="w-full py-[16px] rounded-[14px] border border-[rgba(255,255,255,0.1)] text-[#e7c984] font-serif font-medium text-[20px] transition-colors hover:bg-[rgba(212,168,83,0.05)] hover:border-[#D4A853] disabled:opacity-50"
+            size="lg"
           >
             PAUSE
-          </button>
+          </SakinahButton>
 
-          <button 
-            onClick={() => handleDecision('SILENT_PASS')} // Note: the type says SILENT_PASS for close
+          <SakinahButton 
+            variant="danger"
+            onClick={() => handleDecision('SILENT_PASS')} 
             disabled={isPending}
-            className="w-full py-[16px] rounded-[14px] border border-[rgba(255,255,255,0.1)] text-[#C98A8A] font-serif font-medium text-[20px] transition-colors hover:bg-[rgba(201,138,138,0.1)] hover:border-[rgba(201,138,138,0.3)] disabled:opacity-50"
+            size="lg"
           >
             CLOSE
-          </button>
+          </SakinahButton>
         </div>
       </main>
     </SakinahShell>

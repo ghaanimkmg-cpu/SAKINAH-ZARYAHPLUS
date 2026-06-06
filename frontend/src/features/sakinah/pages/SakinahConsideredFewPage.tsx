@@ -6,7 +6,8 @@ import {
   ConsideredFewList, 
   EmptyMatchState, 
   RayaScriptCard,
-  DevFallbackBadge
+  DevFallbackBadge,
+  SakinahLoadingState
 } from '../components';
 import type { ConsideredFewResponse } from '../types/sakinah.types';
 import { getConsideredFew } from '../services/sakinahApi';
@@ -32,7 +33,7 @@ export const SakinahConsideredFewPage: React.FC = () => {
   };
 
   if (!response) {
-    return <SakinahShell><div className="p-4 text-center">Loading considered few...</div></SakinahShell>;
+    return <SakinahLoadingState fullPage message="Aligning compatible candidates..." />;
   }
 
   return (

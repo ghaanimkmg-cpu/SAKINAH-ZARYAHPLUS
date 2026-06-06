@@ -1,4 +1,5 @@
 import React from 'react';
+import { SakinahButton } from './SakinahButton';
 
 interface InterestActionPanelProps {
   onExpressInterest: () => void;
@@ -16,20 +17,20 @@ export const InterestActionPanel: React.FC<InterestActionPanelProps> = ({
       <p className="text-center text-[12px] text-[#9aa0ac] font-light mb-2">
         If you feel aligned with their values, express your interest. They will not see this unless they also express interest.
       </p>
-      <button 
+      <SakinahButton 
         onClick={onExpressInterest}
         disabled={isPending}
-        className="w-full py-[16px] rounded-[14px] bg-[#D4A853] text-[#07090f] font-serif font-medium text-[20px] transition-opacity disabled:opacity-50 hover:opacity-90"
+        size="lg"
       >
         {isPending ? 'Processing...' : 'Express Interest'}
-      </button>
-      <button 
+      </SakinahButton>
+      <SakinahButton 
+        variant="ghost"
         onClick={onSilentPass}
         disabled={isPending}
-        className="w-full py-[14px] rounded-[14px] border border-[rgba(255,255,255,0.1)] text-[#9aa0ac] font-sans text-[14px] font-medium transition-colors hover:bg-[rgba(255,255,255,0.02)] hover:text-[#EDE7DA] disabled:opacity-50"
       >
         Silent Pass
-      </button>
+      </SakinahButton>
     </div>
   );
 };

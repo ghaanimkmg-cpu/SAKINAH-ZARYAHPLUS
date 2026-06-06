@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { SakinahShell, SakinahHeader, MatchflowStepper, RayaScriptCard, DevFallbackBadge } from '../components';
+import { SakinahShell, SakinahHeader, MatchflowStepper, RayaScriptCard, DevFallbackBadge, SakinahCard, SakinahButton, SakinahLoadingState } from '../components';
 import { getMatchflow } from '../services/sakinahApi';
 import type { MatchflowResponse } from '../types/sakinah.types';
 
@@ -27,7 +27,7 @@ export const SakinahMatchflowPage: React.FC = () => {
   }, [matchflowId]);
 
   if (!matchflow) {
-    return <SakinahShell><div className="p-4 text-center">Loading matchflow...</div></SakinahShell>;
+    return <SakinahLoadingState fullPage message="Loading journey details..." />;
   }
 
   const isConversationOpen = matchflow.current_step === 'CONVERSATION_OPEN';
@@ -44,7 +44,7 @@ export const SakinahMatchflowPage: React.FC = () => {
 
         {isOfflineFallback && <DevFallbackBadge message="Backend unreachable. Proceeding with CONVERSATION_OPEN state." />}
 
-        <div className="bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[22px] p-5">
+        <SakinahCard padding="md">
           <h3 className="font-serif text-[21px] text-[#EDE7DA] mb-2">Current Phase</h3>
           <p className="text-[14px] font-light text-[#9aa0ac] leading-[1.6]">
             {isConversationOpen 
@@ -52,15 +52,16 @@ export const SakinahMatchflowPage: React.FC = () => {
               : "Mutual Interest is pending. Both parties must quietly express interest before any conversation opens."}
           </p>
           <MatchflowStepper currentStep={matchflow.current_step as any} />
-        </div>
+        </SakinahCard>
         
         {isConversationOpen && (
-          <button 
+          <SakinahButton 
             onClick={() => navigate('/sakinah/conversation/mock_conversation_1')}
-            className="w-full py-[16px] rounded-[14px] bg-[#D4A853] text-[#07090f] font-serif font-medium text-[20px] transition-opacity hover:opacity-90 mt-4"
+            size="lg"
+            className="mt-4"
           >
             Enter Conversation
-          </button>
+          </SakinahButton>
         )}
 
       </main>

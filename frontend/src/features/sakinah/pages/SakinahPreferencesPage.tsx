@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SakinahShell, SakinahHeader, DevFallbackBadge, SakinahSelect } from '../components';
+import { SakinahShell, SakinahHeader, DevFallbackBadge, SakinahSelect, SakinahInput, SakinahButton } from '../components';
 import { updateSakinahPreferences } from '../services/sakinahApi';
 
 export const SakinahPreferencesPage: React.FC = () => {
@@ -48,15 +48,15 @@ export const SakinahPreferencesPage: React.FC = () => {
           <div className="space-y-2">
             <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853]">Age Range Preference</label>
             <div className="flex gap-4">
-              <input 
+              <SakinahInput 
                 type="number" 
                 placeholder="Min"
-                className="w-full bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 text-[#EDE7DA] text-[14px] font-light focus:outline-none focus:border-[#D4A853]"
+                className="flex-1"
               />
-              <input 
+              <SakinahInput 
                 type="number" 
                 placeholder="Max"
-                className="w-full bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 text-[#EDE7DA] text-[14px] font-light focus:outline-none focus:border-[#D4A853]"
+                className="flex-1"
               />
             </div>
           </div>
@@ -80,25 +80,26 @@ export const SakinahPreferencesPage: React.FC = () => {
               Check the boundaries that are absolute requirements for you.
             </p>
             <div className="flex flex-col gap-3">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" className="w-5 h-5 accent-[#D4A853] bg-[#111826] border-[rgba(255,255,255,0.06)]" />
-                <span className="text-[14px] text-[#EDE7DA] font-light">Must pray regularly</span>
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input type="checkbox" className="w-5 h-5 accent-[#D4A853] bg-[#111826] border-[rgba(255,255,255,0.06)] rounded-[4px]" />
+                <span className="text-[14px] text-[#EDE7DA] font-light group-hover:text-[#D4A853] transition-colors">Must pray regularly</span>
               </label>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <input type="checkbox" className="w-5 h-5 accent-[#D4A853] bg-[#111826] border-[rgba(255,255,255,0.06)]" />
-                <span className="text-[14px] text-[#EDE7DA] font-light">Must not smoke</span>
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input type="checkbox" className="w-5 h-5 accent-[#D4A853] bg-[#111826] border-[rgba(255,255,255,0.06)] rounded-[4px]" />
+                <span className="text-[14px] text-[#EDE7DA] font-light group-hover:text-[#D4A853] transition-colors">Must not smoke</span>
               </label>
             </div>
           </div>
 
           <div className="md:col-span-2">
-            <button 
+            <SakinahButton 
               type="submit" 
               disabled={isPending}
-              className="w-full py-[16px] rounded-[14px] bg-[#D4A853] text-[#07090f] font-serif font-medium text-[18px] transition-opacity mt-4 hover:opacity-90 disabled:opacity-50"
+              size="lg"
+              className="mt-4"
             >
               {isPending ? 'Saving...' : 'Save Preferences'}
-            </button>
+            </SakinahButton>
           </div>
         </form>
       </main>

@@ -5,7 +5,10 @@ import {
   SakinahHeader, 
   ConversationTopicList, 
   SafetyNotice,
-  RayaScriptCard
+  RayaScriptCard,
+  SakinahCard,
+  SakinahButton,
+  SakinahInput
 } from '../components';
 import type { ConversationTopic } from '../types/sakinah.types';
 import { sendConversationMessage } from '../services/sakinahApi';
@@ -71,45 +74,47 @@ export const SakinahConversationPage: React.FC = () => {
         <div className="mt-4 border-t border-[rgba(255,255,255,0.06)] pt-6">
           <h3 className="font-serif text-[21px] text-[#EDE7DA] mb-4">Chat: Parents & Family</h3>
           
-          <div className="bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 h-48 overflow-y-auto flex flex-col gap-2 mb-4">
+          <SakinahCard padding="sm" className="h-48 overflow-y-auto flex flex-col gap-2 mb-4">
             {messages.length === 0 ? (
               <p className="text-[#5f6675] text-[13px] text-center mt-auto mb-auto">Start the discussion...</p>
             ) : (
               messages.map((m, i) => (
-                <div key={i} className={`p-2 rounded-[8px] text-[13px] max-w-[80%] ${m.sender === 'You' ? 'bg-[#D4A853]/20 text-[#EDE7DA] self-end' : 'bg-[rgba(255,255,255,0.05)] text-[#9aa0ac] self-start'}`}>
+                <div key={i} className={`p-3 rounded-[12px] text-[13px] max-w-[80%] ${m.sender === 'You' ? 'bg-[#D4A853]/20 text-[#EDE7DA] self-end border border-[#D4A853]/20' : 'bg-[rgba(255,255,255,0.05)] text-[#9aa0ac] self-start border border-[rgba(255,255,255,0.05)]'}`}>
                   <strong>{m.sender}: </strong>{m.text}
                 </div>
               ))
             )}
-          </div>
+          </SakinahCard>
 
-          <form onSubmit={handleSendMessage} className="flex gap-2 mb-6">
-            <input 
+          <form onSubmit={handleSendMessage} className="flex gap-2 items-start mb-6">
+            <SakinahInput 
               type="text" 
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Type your message..."
-              className="flex-1 bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[14px] px-4 py-3 text-[#EDE7DA] text-[14px] font-light focus:outline-none focus:border-[#D4A853]"
+              className="flex-1"
             />
-            <button 
+            <SakinahButton 
               type="submit" 
               disabled={isPending}
-              className="px-6 rounded-[14px] bg-[#D4A853] text-[#07090f] font-serif font-medium text-[16px] transition-opacity hover:opacity-90 disabled:opacity-50"
+              fullWidth={false}
+              className="h-[52px]"
             >
               Send
-            </button>
+            </SakinahButton>
           </form>
 
           <h3 className="font-serif text-[21px] text-[#EDE7DA] mb-4">Curriculum</h3>
           <ConversationTopicList topics={topics} />
         </div>
 
-        <button 
+        <SakinahButton 
+          variant="secondary"
           onClick={() => navigate('/sakinah/decision/mock_matchflow_1')}
-          className="w-full py-[16px] rounded-[14px] border border-[#D4A853]/50 text-[#D4A853] font-serif font-medium text-[18px] transition-opacity hover:bg-[#D4A853]/10"
+          size="lg"
         >
           Make a Decision
-        </button>
+        </SakinahButton>
       </main>
     </SakinahShell>
   );
