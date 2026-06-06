@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SakinahShell, SakinahHeader, DevFallbackBadge } from '../components';
+import { SakinahShell, SakinahHeader, DevFallbackBadge, SakinahSelect } from '../components';
 import { updateSakinahPreferences } from '../services/sakinahApi';
 
 export const SakinahPreferencesPage: React.FC = () => {
@@ -8,10 +8,18 @@ export const SakinahPreferencesPage: React.FC = () => {
   const [isPending, setIsPending] = useState(false);
   const [errorFallback, setErrorFallback] = useState('');
 
+  const [relocation, setRelocation] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsPending(true);
     setErrorFallback('');
+
+    if (!relocation) {
+      setErrorFallback('Please complete the required fields before continuing.');
+      return;
+    }
+
+    setIsPending(true);
     try {
       // In a real app we'd collect form data. For now we pass a mock payload.
       await updateSakinahPreferences({ relocationWillingness: true });
@@ -53,15 +61,18 @@ export const SakinahPreferencesPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853]">Willingness to Relocate</label>
-            <select className="w-full bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 text-[#EDE7DA] text-[14px] font-light focus:outline-none focus:border-[#D4A853]">
-              <option value="">Select an option</option>
-              <option value="yes">Yes, open to relocating</option>
-              <option value="no">No, prefer to stay locally</option>
-              <option value="flexible">Flexible / Let's discuss</option>
-            </select>
-          </div>
+          <SakinahSelect
+            label="Willingness to Relocate"
+            value={relocation}
+            onChange={(e) => setRelocation(e.target.value)}
+            placeholder="Choose an option"
+            required
+            options={[
+              { value: 'yes', label: 'Yes, open to relocating' },
+              { value: 'no', label: 'No, prefer to stay locally' },
+              { value: 'flexible', label: "Flexible / Let's discuss" },
+            ]}
+          />
 
           <div className="space-y-2 pt-4 md:col-span-2">
             <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#C98A8A]">Non-Negotiable Boundaries</label>

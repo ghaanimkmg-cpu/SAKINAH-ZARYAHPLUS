@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SakinahShell, SakinahHeader, DevFallbackBadge } from '../components';
+import { SakinahShell, SakinahHeader, DevFallbackBadge, SakinahSelect } from '../components';
 import { updateSakinahProfile } from '../services/sakinahApi';
 
 export const SakinahProfileSignalsPage: React.FC = () => {
@@ -8,10 +8,20 @@ export const SakinahProfileSignalsPage: React.FC = () => {
   const [isPending, setIsPending] = useState(false);
   const [errorFallback, setErrorFallback] = useState('');
 
+  const [approach, setApproach] = useState('');
+  const [prayer, setPrayer] = useState('');
+  const [timeline, setTimeline] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsPending(true);
     setErrorFallback('');
+
+    if (!approach || !prayer || !timeline) {
+      setErrorFallback('Please complete the required fields before continuing.');
+      return;
+    }
+
+    setIsPending(true);
     try {
       // In a real app we'd collect form data. For now we pass a mock payload.
       await updateSakinahProfile({ timelineToMarry: '1_year' });
@@ -38,36 +48,45 @@ export const SakinahProfileSignalsPage: React.FC = () => {
         {errorFallback && <DevFallbackBadge message={errorFallback} />}
 
         <form className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853]">Sect / Thought</label>
-            <select className="w-full bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 text-[#EDE7DA] text-[14px] font-light focus:outline-none focus:border-[#D4A853]">
-              <option value="">Select your approach</option>
-              <option value="sunni">Sunni</option>
-              <option value="shia">Shia</option>
-              <option value="just_muslim">Just Muslim</option>
-            </select>
-          </div>
+          <SakinahSelect
+            label="Sect / Thought"
+            value={approach}
+            onChange={(e) => setApproach(e.target.value)}
+            placeholder="Choose your approach"
+            required
+            options={[
+              { value: 'sunni', label: 'Sunni' },
+              { value: 'shia', label: 'Shia' },
+              { value: 'just_muslim', label: 'Just Muslim' },
+            ]}
+          />
 
-          <div className="space-y-2">
-            <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853]">Prayer Frequency</label>
-            <select className="w-full bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 text-[#EDE7DA] text-[14px] font-light focus:outline-none focus:border-[#D4A853]">
-              <option value="">Select frequency</option>
-              <option value="always">Always Prays</option>
-              <option value="usually">Usually Prays</option>
-              <option value="sometimes">Sometimes Prays</option>
-              <option value="working_on_it">Working on it</option>
-            </select>
-          </div>
+          <SakinahSelect
+            label="Prayer Frequency"
+            value={prayer}
+            onChange={(e) => setPrayer(e.target.value)}
+            placeholder="Choose a frequency"
+            required
+            options={[
+              { value: 'always', label: 'Always Prays' },
+              { value: 'usually', label: 'Usually Prays' },
+              { value: 'sometimes', label: 'Sometimes Prays' },
+              { value: 'working_on_it', label: 'Working on it' },
+            ]}
+          />
 
-          <div className="space-y-2">
-            <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853]">Timeline to Marry</label>
-            <select className="w-full bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 text-[#EDE7DA] text-[14px] font-light focus:outline-none focus:border-[#D4A853]">
-              <option value="">Select timeline</option>
-              <option value="asap">As soon as possible</option>
-              <option value="1_year">Within 1 year</option>
-              <option value="2_years">Within 2 years</option>
-            </select>
-          </div>
+          <SakinahSelect
+            label="Timeline to Marry"
+            value={timeline}
+            onChange={(e) => setTimeline(e.target.value)}
+            placeholder="Choose a timeline"
+            required
+            options={[
+              { value: 'asap', label: 'As soon as possible' },
+              { value: '1_year', label: 'Within 1 year' },
+              { value: '2_years', label: 'Within 2 years' },
+            ]}
+          />
 
           <div className="space-y-2 md:col-span-2">
             <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853]">A short note about your journey</label>
