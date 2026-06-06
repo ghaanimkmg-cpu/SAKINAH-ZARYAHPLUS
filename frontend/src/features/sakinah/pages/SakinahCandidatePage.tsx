@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { 
   SakinahShell, 
   SakinahHeader, 
@@ -11,15 +12,57 @@ import { mockCandidates } from '../data/mockSakinahData';
 import { expressInterest, silentPass } from '../services/sakinahApi';
 
 export const SakinahCandidatePage: React.FC = () => {
-  // Mock data usage
-  const candidate = mockCandidates[0];
+  const navigate = useNavigate();
+  const { candidateId } = useParams();
+  const [isPending, setIsPending] = useState(false);
+  const [errorFallback, setErrorFallback] = useState('');
+
+  // Fallback to mock for now if not fetched via API
+  const candidate = mockCandidates.find(c => c.candidateId === candidateId) || mockCandidates[0];
+
+  const handleExpressInterest = async () => {
+    setIsPending(true);
+    setErrorFallback('');
+    try {
+      await expressInterest(candidate.candidateId);
+      // Assuming mutual interest for dev flow preview
+      navigate('/sakinah/matchflow/mock_matchflow_1');
+    } catch (err) {
+      console.warn('Backend offline, using dev fallback for expressInterest', err);
+      setErrorFallback('Backend unreachable. Proceeding in Development Preview Mode.');
+      setTimeout(() => navigate('/sakinah/matchflow/mock_matchflow_1'), 1000);
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const handleSilentPass = async () => {
+    setIsPending(true);
+    setErrorFallback('');
+    try {
+      await silentPass(candidate.candidateId);
+      navigate('/sakinah/considered-few');
+    } catch (err) {
+      console.warn('Backend offline, using dev fallback for silentPass', err);
+      setErrorFallback('Backend unreachable. Proceeding in Development Preview Mode.');
+      setTimeout(() => navigate('/sakinah/considered-few'), 1000);
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   return (
     <SakinahShell>
-      <SakinahHeader title={candidate.displayName} subtitle="CANDIDATE PROFILE" onBack={() => console.log('Go back')} />
+      <SakinahHeader title={candidate.displayName} subtitle="CANDIDATE PROFILE" onBack={() => navigate('/sakinah/considered-few')} />
 
       <main className="mt-6 flex flex-col gap-6">
         <MatchflowStepper currentStep="VIEWING_CANDIDATE" className="mb-2" />
+
+        {errorFallback && (
+          <div className="bg-[#D4A853]/10 border border-[#D4A853]/30 rounded-[12px] p-3 text-center text-[12px] text-[#D4A853]">
+            {errorFallback}
+          </div>
+        )}
 
         <CandidatePortraitCard candidate={candidate} />
 
@@ -46,12 +89,8 @@ export const SakinahCandidatePage: React.FC = () => {
         />
 
         <InterestActionPanel 
-          onExpressInterest={() => {
-            expressInterest(candidate.candidateId).then(() => console.log('Expressed Interest')).catch(console.error);
-          }} 
-          onSilentPass={() => {
-            silentPass(candidate.candidateId).then(() => console.log('Silently Passed')).catch(console.error);
-          }} 
+          onExpressInterest={handleExpressInterest} 
+          onSilentPass={handleSilentPass} 
         />
       </main>
     </SakinahShell>

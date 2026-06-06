@@ -1,7 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SakinahShell, SakinahHeader } from '../components';
+import { updateSakinahProfile } from '../services/sakinahApi';
 
 export const SakinahProfileSignalsPage: React.FC = () => {
+  const navigate = useNavigate();
+  const [isPending, setIsPending] = useState(false);
+  const [errorFallback, setErrorFallback] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsPending(true);
+    setErrorFallback('');
+    try {
+      // In a real app we'd collect form data. For now we pass a mock payload.
+      await updateSakinahProfile({ timelineToMarry: '1_year' });
+      navigate('/sakinah/preferences');
+    } catch (err) {
+      console.warn('Backend offline, using dev fallback for SakinahProfileSignals', err);
+      setErrorFallback('Backend unreachable. Proceeding in Development Preview Mode.');
+      // Dev fallback: allow navigation even if backend is down
+      setTimeout(() => navigate('/sakinah/preferences'), 1000);
+    } finally {
+      setIsPending(false);
+    }
+  };
+
   return (
     <SakinahShell>
       <SakinahHeader title="Your Profile" subtitle="CHARACTER & SIGNALS" />
@@ -11,7 +35,13 @@ export const SakinahProfileSignalsPage: React.FC = () => {
           Share your values, practices, and outlook. These signals help us find meaningful alignment, without reducing you to public labels or scores.
         </p>
 
-        <form className="space-y-6 mt-4" onSubmit={(e) => e.preventDefault()}>
+        {errorFallback && (
+          <div className="bg-[#D4A853]/10 border border-[#D4A853]/30 rounded-[12px] p-3 text-center text-[12px] text-[#D4A853]">
+            {errorFallback}
+          </div>
+        )}
+
+        <form className="space-y-6 mt-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853]">Sect / Thought</label>
             <select className="w-full bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 text-[#EDE7DA] text-[14px] font-light focus:outline-none focus:border-[#D4A853]">
@@ -52,8 +82,12 @@ export const SakinahProfileSignalsPage: React.FC = () => {
             />
           </div>
 
-          <button type="submit" className="w-full py-[16px] rounded-[14px] bg-[#D4A853] text-[#07090f] font-serif font-medium text-[18px] transition-opacity mt-4 hover:opacity-90">
-            Save Signals
+          <button 
+            type="submit" 
+            disabled={isPending}
+            className="w-full py-[16px] rounded-[14px] bg-[#D4A853] text-[#07090f] font-serif font-medium text-[18px] transition-opacity mt-4 hover:opacity-90 disabled:opacity-50"
+          >
+            {isPending ? 'Saving...' : 'Save Signals'}
           </button>
         </form>
       </main>

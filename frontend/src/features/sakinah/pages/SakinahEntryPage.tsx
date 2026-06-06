@@ -1,7 +1,11 @@
 import React from 'react';
 import { SakinahShell, SakinahHeader, RayaOrb, RayaScriptCard } from '../components';
 
+import { useNavigate } from 'react-router-dom';
+
 export const SakinahEntryPage: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <SakinahShell>
       <SakinahHeader />
@@ -22,7 +26,10 @@ export const SakinahEntryPage: React.FC = () => {
           className="w-full text-left mb-10"
         />
 
-        <button className="w-full py-[16px] rounded-[14px] bg-[#D4A853] text-[#07090f] font-serif font-medium text-[20px] transition-opacity hover:opacity-90">
+        <button 
+          onClick={() => navigate('/sakinah/eligibility')}
+          className="w-full py-[16px] rounded-[14px] bg-[#D4A853] text-[#07090f] font-serif font-medium text-[20px] transition-opacity hover:opacity-90"
+        >
           Begin with Sincerity
         </button>
       </main>
