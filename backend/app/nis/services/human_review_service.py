@@ -73,6 +73,21 @@ class NISHumanReviewService:
         return status not in ["BANNED", "UNDER_REVIEW", "PAUSED"]
 
     @classmethod
+    def list_reviews(cls) -> list[dict]:
+        reviews = []
+        for rid, rev in _MOCK_REVIEWS_DB.items():
+            safe_rev = {
+                "review_id": rid,
+                "user_id": rev["user_id"],
+                "severity": rev["severity"],
+                "status": rev["status"],
+                "flag_id": rev["flag_id"],
+                "decision": rev.get("decision")
+            }
+            reviews.append(safe_rev)
+        return reviews
+
+    @classmethod
     def clear_mock_state(cls):
         _MOCK_REVIEWS_DB.clear()
         _MOCK_USER_STATES.clear()

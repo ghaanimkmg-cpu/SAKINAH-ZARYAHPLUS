@@ -128,3 +128,21 @@ def test_api_endpoints():
     })
     assert rev_res.status_code == 200
     assert rev_res.json()["decision"] == "PERMANENT_BAN"
+
+def test_admin_review_listing_exists_and_is_safe():
+    req = ReportRequest(reported_user_id="user_bad_123", flag_type="MANIPULATION_RISK", severity="HIGH")
+    NISSafetyService.submit_report("reporter_secret_identity", req)
+
+    res = client.get("/api/v1/nis/admin/reviews")
+    assert res.status_code == 200
+    data = res.json()
+    assert len(data) >= 1
+    
+    first_rev = data[0]
+    assert "review_id" in first_rev
+    assert "user_id" in first_rev
+    assert first_rev["user_id"] == "user_bad_123"
+    
+    dump = str(data).lower()
+    assert "reporter_secret_identity" not in dump
+    assert "raw_raya" not in dump
