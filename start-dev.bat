@@ -19,10 +19,15 @@ echo Starting Frontend (Vite)...
 start "ZaryahPlus Frontend" cmd /k "cd frontend && npm run dev"
 
 echo.
-echo Both services have been launched in separate windows!
-echo - Frontend usually runs on http://localhost:5173
-echo - Backend usually runs on http://localhost:8000
+echo Both services are launching in separate windows!
+echo Please keep the terminal windows open. Close them to stop the servers.
 echo.
-echo Please check the opened terminal windows for logs and any startup errors.
-echo Close the terminal windows to stop the servers.
+echo Waiting a few seconds for servers to start before opening the browser...
+timeout /t 6 /nobreak >nul
+
+:: Automatically open Sakinah frontend
+echo Opening Sakinah frontend in your default browser...
+echo If the browser opens before the server is ready, just refresh the page after a few seconds.
+start http://localhost:5173/sakinah
+echo.
 pause

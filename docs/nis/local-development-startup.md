@@ -40,6 +40,8 @@ To launch both the frontend and backend servers simultaneously:
 3. Two new terminal windows will open automatically:
    - One window will activate the Python virtual environment and start the FastAPI backend via Uvicorn.
    - The other window will start the Vite frontend via `npm run dev`.
+4. The script will wait a few seconds and then **automatically open your default browser** to the Sakinah frontend at: `http://localhost:5173/sakinah`.
+   - *Note: If the page does not load immediately because the server is still starting up, simply wait a few seconds and refresh.*
 
 ## Default Ports
 
