@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SakinahShell, SakinahHeader, SafetyNotice } from '../components';
+import { SakinahShell, SakinahHeader, SafetyNotice, DevFallbackBadge } from '../components';
 import { getSakinahEligibility } from '../services/sakinahApi';
 
 type EligibilityState = 'NOT_STARTED' | 'PENDING' | 'VERIFIED' | 'HUMAN_REVIEW_REQUIRED' | 'REJECTED' | 'BANNED';
@@ -35,11 +35,7 @@ export const SakinahEligibilityPage: React.FC = () => {
           To ensure a secure environment for everyone seeking marriage, we enforce strict identity and safety checks.
         </p>
 
-        {isOfflineFallback && (
-          <div className="bg-[#D4A853]/10 border border-[#D4A853]/30 rounded-[12px] p-3 text-center text-[12px] text-[#D4A853]">
-            [Dev Fallback: Backend unreachable, assuming VERIFIED]
-          </div>
-        )}
+        {isOfflineFallback && <DevFallbackBadge />}
 
         <div className="border border-[rgba(212,168,83,0.16)] bg-gradient-to-br from-[#111826] to-[#0f1521] rounded-[22px] p-6 mt-4">
           <h3 className="font-mono text-[10px] tracking-[0.2em] uppercase text-[#D4A853] mb-4">

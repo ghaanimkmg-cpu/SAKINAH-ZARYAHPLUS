@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { SakinahShell, SakinahHeader } from '../components';
+import { SakinahShell, SakinahHeader, DevFallbackBadge } from '../components';
 import { submitDecision } from '../services/sakinahApi';
 import type { DecisionOutcome } from '../types/sakinah.types';
 
@@ -42,11 +42,7 @@ export const SakinahDecisionPage: React.FC = () => {
           You have completed the structured conversation. How would you like to proceed? Make this choice with sincerity and intention. No one will pressure you.
         </p>
 
-        {errorFallback && (
-          <div className="bg-[#D4A853]/10 border border-[#D4A853]/30 rounded-[12px] p-3 text-center text-[12px] text-[#D4A853]">
-            {errorFallback}
-          </div>
-        )}
+        {errorFallback && <DevFallbackBadge message={errorFallback} />}
 
         <div className="mt-8 flex flex-col gap-4">
           <button 

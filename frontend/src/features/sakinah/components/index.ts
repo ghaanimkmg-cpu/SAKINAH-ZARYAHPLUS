@@ -12,3 +12,4 @@ export * from './ConversationMessageList';
 export * from './DecisionPanel';
 export * from './SafetyNotice';
 export * from './EmptyMatchState';
+export * from './DevFallbackBadge';

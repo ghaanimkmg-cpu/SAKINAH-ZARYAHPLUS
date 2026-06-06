@@ -6,7 +6,8 @@ import {
   CandidatePortraitCard, 
   InterestActionPanel, 
   RayaScriptCard,
-  MatchflowStepper
+  MatchflowStepper,
+  DevFallbackBadge
 } from '../components';
 import { mockCandidates } from '../data/mockSakinahData';
 import { expressInterest, silentPass } from '../services/sakinahApi';
@@ -58,11 +59,7 @@ export const SakinahCandidatePage: React.FC = () => {
       <main className="mt-6 flex flex-col gap-6">
         <MatchflowStepper currentStep="VIEWING_CANDIDATE" className="mb-2" />
 
-        {errorFallback && (
-          <div className="bg-[#D4A853]/10 border border-[#D4A853]/30 rounded-[12px] p-3 text-center text-[12px] text-[#D4A853]">
-            {errorFallback}
-          </div>
-        )}
+        {errorFallback && <DevFallbackBadge message={errorFallback} />}
 
         <CandidatePortraitCard candidate={candidate} />
 

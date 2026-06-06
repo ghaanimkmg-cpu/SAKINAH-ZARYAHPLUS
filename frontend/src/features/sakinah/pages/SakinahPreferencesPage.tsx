@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SakinahShell, SakinahHeader } from '../components';
+import { SakinahShell, SakinahHeader, DevFallbackBadge } from '../components';
 import { updateSakinahPreferences } from '../services/sakinahApi';
 
 export const SakinahPreferencesPage: React.FC = () => {
@@ -34,13 +34,9 @@ export const SakinahPreferencesPage: React.FC = () => {
           Define the qualities that are essential for your marriage. We use these to gently filter candidates so you only see those who align with your core boundaries.
         </p>
 
-        {errorFallback && (
-          <div className="bg-[#D4A853]/10 border border-[#D4A853]/30 rounded-[12px] p-3 text-center text-[12px] text-[#D4A853]">
-            {errorFallback}
-          </div>
-        )}
+        {errorFallback && <DevFallbackBadge message={errorFallback} />}
 
-        <form className="space-y-6 mt-4" onSubmit={handleSubmit}>
+        <form className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6 items-start" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#D4A853]">Age Range Preference</label>
             <div className="flex gap-4">
@@ -67,7 +63,7 @@ export const SakinahPreferencesPage: React.FC = () => {
             </select>
           </div>
 
-          <div className="space-y-2 pt-4">
+          <div className="space-y-2 pt-4 md:col-span-2">
             <label className="font-mono text-[10px] tracking-[0.15em] uppercase text-[#C98A8A]">Non-Negotiable Boundaries</label>
             <p className="text-[12px] text-[#5f6675] mb-3">
               Check the boundaries that are absolute requirements for you.
@@ -84,13 +80,15 @@ export const SakinahPreferencesPage: React.FC = () => {
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            disabled={isPending}
-            className="w-full py-[16px] rounded-[14px] bg-[#D4A853] text-[#07090f] font-serif font-medium text-[18px] transition-opacity mt-6 hover:opacity-90 disabled:opacity-50"
-          >
-            {isPending ? 'Saving...' : 'Save Preferences'}
-          </button>
+          <div className="md:col-span-2">
+            <button 
+              type="submit" 
+              disabled={isPending}
+              className="w-full py-[16px] rounded-[14px] bg-[#D4A853] text-[#07090f] font-serif font-medium text-[18px] transition-opacity mt-4 hover:opacity-90 disabled:opacity-50"
+            >
+              {isPending ? 'Saving...' : 'Save Preferences'}
+            </button>
+          </div>
         </form>
       </main>
     </SakinahShell>

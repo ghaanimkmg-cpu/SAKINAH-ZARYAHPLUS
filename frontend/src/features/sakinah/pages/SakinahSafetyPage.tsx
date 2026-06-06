@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SakinahShell, SakinahHeader, SafetyNotice } from '../components';
+import { SakinahShell, SakinahHeader, SafetyNotice, DevFallbackBadge } from '../components';
 import { submitReport } from '../services/sakinahApi';
 
 export const SakinahSafetyPage: React.FC = () => {
@@ -56,11 +56,7 @@ export const SakinahSafetyPage: React.FC = () => {
             </div>
           )}
 
-          {reportStatus === 'FALLBACK' && (
-            <div className="bg-[#D4A853]/10 border border-[#D4A853]/30 rounded-[12px] p-3 text-center text-[12px] text-[#D4A853]">
-              [Dev Fallback: Backend unreachable. Report mock processed.]
-            </div>
-          )}
+          {reportStatus === 'FALLBACK' && <DevFallbackBadge message="Backend unreachable. Report mock processed." />}
 
           <button 
             onClick={handleReport}

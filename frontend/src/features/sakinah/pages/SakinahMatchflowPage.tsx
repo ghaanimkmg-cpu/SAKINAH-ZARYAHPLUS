@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { SakinahShell, SakinahHeader, MatchflowStepper, RayaScriptCard } from '../components';
+import { SakinahShell, SakinahHeader, MatchflowStepper, RayaScriptCard, DevFallbackBadge } from '../components';
 import { getMatchflow } from '../services/sakinahApi';
 import type { MatchflowResponse } from '../types/sakinah.types';
 
@@ -42,11 +42,7 @@ export const SakinahMatchflowPage: React.FC = () => {
           className="mb-2"
         />
 
-        {isOfflineFallback && (
-          <div className="bg-[#D4A853]/10 border border-[#D4A853]/30 rounded-[12px] p-3 text-center text-[12px] text-[#D4A853]">
-            [Dev Fallback: Backend unreachable. Proceeding with CONVERSATION_OPEN state.]
-          </div>
-        )}
+        {isOfflineFallback && <DevFallbackBadge message="Backend unreachable. Proceeding with CONVERSATION_OPEN state." />}
 
         <div className="bg-[#111826] border border-[rgba(255,255,255,0.06)] rounded-[22px] p-5">
           <h3 className="font-serif text-[21px] text-[#EDE7DA] mb-2">Current Phase</h3>

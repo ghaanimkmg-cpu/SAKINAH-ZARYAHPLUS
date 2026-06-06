@@ -44,7 +44,7 @@ export const SakinahConversationPage: React.FC = () => {
     } catch (err) {
       console.warn('Backend offline, using dev fallback for sendMessage', err);
       // Dev fallback: just add to UI
-      setMessages([...messages, { sender: 'You', text: inputText }, { sender: 'System', text: '[Dev Fallback: Message received safely]' }]);
+      setMessages([...messages, { sender: 'You', text: inputText }, { sender: 'System', text: 'Development Preview Mode: Message received safely.' }]);
       setInputText('');
     } finally {
       setIsPending(false);

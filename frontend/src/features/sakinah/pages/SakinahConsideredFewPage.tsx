@@ -5,7 +5,8 @@ import {
   SakinahHeader, 
   ConsideredFewList, 
   EmptyMatchState, 
-  RayaScriptCard 
+  RayaScriptCard,
+  DevFallbackBadge
 } from '../components';
 import type { ConsideredFewResponse } from '../types/sakinah.types';
 import { getConsideredFew } from '../services/sakinahApi';
@@ -44,11 +45,7 @@ export const SakinahConsideredFewPage: React.FC = () => {
           className="mb-2"
         />
 
-        {isOfflineFallback && (
-          <div className="bg-[#D4A853]/10 border border-[#D4A853]/30 rounded-[12px] p-3 text-center text-[12px] text-[#D4A853]">
-            [Dev Fallback: Backend unreachable. Showing mock candidates.]
-          </div>
-        )}
+        {isOfflineFallback && <DevFallbackBadge />}
 
         {response.status === 'NO_SUITABLE_MATCHES_RIGHT_NOW' || !response.candidates || response.candidates.length === 0 ? (
           <EmptyMatchState />
