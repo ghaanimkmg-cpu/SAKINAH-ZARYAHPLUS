@@ -20,3 +20,18 @@ export * from './SakinahInput';
 export * from './SakinahTextarea';
 export * from './SakinahLoadingState';
 export * from './SakinahErrorState';
+
+// Phase B Components (Dev Reference Parity)
+export * from './SakinahJourneyFrame';
+export * from './SakinahStageRail';
+export * from './SakinahJourneyStepper';
+export * from './SakinahLaneCard';
+export * from './SakinahReflectionCard';
+export * from './SakinahChoiceChip';
+export * from './SakinahSpectrumChoice';
+export * from './SakinahPortraitCard';
+export * from './SakinahMetaRow';
+export * from './SakinahSupportCard';
+export * from './SakinahNotice';
+export * from './SakinahRayaOrb';
+export * from './SakinahRayaSheet';
