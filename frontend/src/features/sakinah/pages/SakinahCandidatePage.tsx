@@ -47,10 +47,10 @@ export const SakinahCandidatePage: React.FC = () => {
 
         <InterestActionPanel 
           onExpressInterest={() => {
-            expressInterest(candidate.id).then(() => console.log('Expressed Interest')).catch(console.error);
+            expressInterest(candidate.candidateId).then(() => console.log('Expressed Interest')).catch(console.error);
           }} 
           onSilentPass={() => {
-            silentPass(candidate.id).then(() => console.log('Silently Passed')).catch(console.error);
+            silentPass(candidate.candidateId).then(() => console.log('Silently Passed')).catch(console.error);
           }} 
         />
       </main>

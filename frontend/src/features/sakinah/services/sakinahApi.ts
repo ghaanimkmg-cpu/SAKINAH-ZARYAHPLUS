@@ -1,5 +1,4 @@
 import type { 
-  CandidateSummary, 
   ConsideredFewResponse, 
   ConversationResponse,
   MatchflowResponse,

@@ -6,7 +6,7 @@ import {
   EmptyMatchState, 
   RayaScriptCard 
 } from '../components';
-import { ConsideredFewResponse } from '../types/sakinah.types';
+import type { ConsideredFewResponse } from '../types/sakinah.types';
 import { getConsideredFew } from '../services/sakinahApi';
 
 export const SakinahConsideredFewPage: React.FC = () => {

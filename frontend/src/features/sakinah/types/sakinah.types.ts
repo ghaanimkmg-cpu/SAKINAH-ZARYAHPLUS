@@ -58,3 +58,18 @@ export interface SafetyReportPayload {
   description?: string;
   timestamp: string;
 }
+
+export type SakinahProfileData = UserSignalProfilePayload;
+export type SakinahMatchPreferences = MatchPreferencePayload;
+
+export interface ConversationResponse {
+  current_topic: string;
+  topics: ConversationTopic[];
+  messages: any[];
+}
+
+export interface MatchflowResponse {
+  matchflow_id: string;
+  current_step: string;
+  steps: any[];
+}
