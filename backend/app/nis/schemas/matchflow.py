@@ -13,3 +13,11 @@ class MatchflowResponse(BaseModel):
     steps: List[MatchflowStep]
     chat_open: bool
     message: str
+
+class DecisionRequest(BaseModel):
+    outcome: str
+
+class DecisionResponse(BaseModel):
+    status: str
+    matchflow_id: str
+    outcome: str

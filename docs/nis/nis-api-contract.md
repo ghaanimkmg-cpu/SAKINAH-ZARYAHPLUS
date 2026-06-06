@@ -116,7 +116,19 @@ The API must **never** expose:
   - **Body:** `{"age_min": 26}`
   - **Response:** `{"status": "UPDATED"}`
 
+### Considered Few
+- **GET /api/v1/nis/considered-few**
+  - **Purpose:** Retrieve the curated list of candidates considered highly compatible.
+  - **Auth:** Required
+  - **Response:** `{"status": "FOUND", "candidates": [...]}`
+  - **Privacy:** Frontend must not try to recalculate or second-guess this list.
+
 ### Candidate / Interest
+- **GET /api/v1/nis/candidates/{candidate_id}**
+  - **Purpose:** Retrieve minimal safe profile details of a candidate.
+  - **Auth:** Required
+  - **Response:** `{"candidate_id": "...", "display_name": "...", "shared_strengths": [...]}`
+  - **Privacy:** Must NOT expose raw private signals, raw Raya/Barakah data, compatibility percentages, or photos before gated stages.
 - **POST /api/v1/nis/candidates/{candidate_id}/interest**
   - **Purpose:** Express private interest in a candidate.
   - **Auth:** Required
@@ -131,6 +143,12 @@ The API must **never** expose:
   - **Purpose:** Get the current state and step of a matchflow.
   - **Auth:** Required
   - **Response:** `{"matchflow_id": "mf_123", "current_step": "MUTUAL_INTEREST", "steps": [...]}`
+- **POST /api/v1/nis/matchflows/{matchflow_id}/decision**
+  - **Purpose:** Submit a user's decision (e.g., PROCEED, PAUSE, CLOSE).
+  - **Auth:** Required
+  - **Body:** `{"outcome": "PROCEED"}`
+  - **Response:** `{"status": "DECISION_RECORDED", "outcome": "PROCEED"}`
+  - **Privacy:** Must not pressure the user and must not allow Raya to recommend an outcome.
 
 ### Conversation
 - **GET /api/v1/nis/conversations/{conversation_id}**

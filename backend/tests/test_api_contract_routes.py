@@ -32,12 +32,17 @@ def test_important_endpoints_exist():
     assert "/api/v1/nis/profile/me" in routes
     assert "/api/v1/nis/preferences/me" in routes
     
-    # 4. Interest/pass endpoints exist
+    # Considered Few
+    assert "/api/v1/nis/considered-few" in routes
+
+    # 4. Interest/pass/candidate endpoints exist
+    assert "/api/v1/nis/candidates/{candidate_id}" in routes
     assert "/api/v1/nis/candidates/{candidate_id}/interest" in routes
     assert "/api/v1/nis/candidates/{candidate_id}/pass" in routes
     
     # Matchflow
     assert "/api/v1/nis/matchflows/{matchflow_id}" in routes
+    assert "/api/v1/nis/matchflows/{matchflow_id}/decision" in routes
     
     # 5. Conversation endpoints exist
     assert "/api/v1/nis/conversations/{conversation_id}" in routes

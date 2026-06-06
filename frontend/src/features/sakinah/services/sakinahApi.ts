@@ -82,9 +82,20 @@ export async function silentPass(candidateId: string) {
   return fetchNisApi(`/candidates/${candidateId}/pass`, { method: 'POST' });
 }
 
+export async function getCandidateDetail(candidateId: string) {
+  return fetchNisApi(`/candidates/${candidateId}`);
+}
+
 // Matchflow
 export async function getMatchflow(matchflowId: string): Promise<MatchflowResponse> {
   return fetchNisApi(`/matchflows/${matchflowId}`);
+}
+
+export async function submitDecision(matchflowId: string, outcome: 'PROCEED' | 'PAUSE' | 'CLOSE') {
+  return fetchNisApi(`/matchflows/${matchflowId}/decision`, {
+    method: 'POST',
+    body: JSON.stringify({ outcome })
+  });
 }
 
 // Conversation
