@@ -4,11 +4,15 @@ class VerificationStatus(str, enum.Enum):
     PENDING = "PENDING"
     VERIFIED = "VERIFIED"
     REJECTED = "REJECTED"
+    HUMAN_REVIEW_REQUIRED = "HUMAN_REVIEW_REQUIRED"
 
 class EligibilityStatus(str, enum.Enum):
-    ELIGIBLE = "ELIGIBLE"
-    INELIGIBLE = "INELIGIBLE"
-    NEEDS_REVIEW = "NEEDS_REVIEW"
+    NOT_STARTED = "NOT_STARTED"
+    PENDING = "PENDING"
+    VERIFIED = "VERIFIED"
+    HUMAN_REVIEW_REQUIRED = "HUMAN_REVIEW_REQUIRED"
+    REJECTED = "REJECTED"
+    BANNED = "BANNED"
 
 class Gender(str, enum.Enum):
     MALE = "MALE"
