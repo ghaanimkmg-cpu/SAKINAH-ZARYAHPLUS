@@ -23,6 +23,18 @@ const APP_VERSION = resolveAppVersion()
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true
+      },
+      '/health': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true
+      }
+    }
+  },
   define: {
     // Compile-time constant — replaces `__APP_VERSION__` everywhere in the
     // bundle at build time. Cheaper than a runtime env read on every render.

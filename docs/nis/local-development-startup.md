@@ -46,5 +46,20 @@ To launch both the frontend and backend servers simultaneously:
 - **Frontend:** http://localhost:5173
 - **Backend API:** http://localhost:8000
 - **Backend OpenAPI Docs:** http://localhost:8000/docs
+- **Backend Health Check:** http://localhost:8000/health
+
+## Architecture: Frontend-Backend Connection
+
+The Sakinah frontend connects to the NIS backend using relative API paths (e.g., `/api/v1/nis/eligibility/me`). During local development, the Vite server uses a **proxy configuration** (`vite.config.ts`) to forward these requests to the local backend running on `http://127.0.0.1:8000`.
+
+### Development Preview Mode
+
+If the frontend attempts to make an API call and the backend is unreachable (e.g., the backend server is not running or the proxy fails), the UI will gracefully fall back to **Development Preview Mode**. 
+
+- **Why it appears:** It prevents the frontend from crashing during local UI development when the backend isn't needed. Safe mock data is used instead.
+- **How to fix it:** If you see "Backend is not connected, so safe demo data is being used" while expecting real data:
+  1. Ensure the backend is running via `start-dev.bat`.
+  2. Verify the backend health check at http://127.0.0.1:8000/health is returning a success response.
+  3. Ensure the frontend is being accessed via `http://localhost:5173` so the proxy can correctly route `/api` and `/health` requests to `127.0.0.1:8000`.
 
 To stop the development servers, simply close the two newly opened terminal windows.
