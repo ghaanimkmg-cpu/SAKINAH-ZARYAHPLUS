@@ -49,3 +49,18 @@ The following features are stubbed or mocked in the current parity build and mus
 - [ ] **PostgreSQL Live DB Wiring:** Transition the SQLite/in-memory stubs or missing columns to the live production schema on PostgreSQL.
 - [ ] **Real KYC / Liveness Vendor:** Integrate the actual third-party vendor (e.g., Onfido, SumSub) for KYC and liveness checks to replace the visual placeholder screens.
 - [ ] **Admin Role Enforcement:** Ensure that NIS backend routes fully enforce admin-only constraints where required via JWT scopes.
+
+## 5. Troubleshooting Build Issues
+If `vite build` or `esbuild` fails with an out-of-memory error (e.g. `fatal error: out of memory`), it is due to the large number of modules. You must increase the Node.js max memory size before building:
+
+**Windows PowerShell:**
+```powershell
+$env:NODE_OPTIONS="--max-old-space-size=4096"
+npm run build
+```
+
+**Linux/macOS:**
+```bash
+export NODE_OPTIONS="--max-old-space-size=4096"
+npm run build
+```

@@ -32,6 +32,8 @@ class MatchInterestStatus(str, enum.Enum):
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"
     DECLINED = "DECLINED"
+    INTERESTED = "INTERESTED"
+    PASSED = "PASSED"
 
 class MatchflowStatus(str, enum.Enum):
     PENDING = "PENDING"
@@ -58,6 +60,10 @@ class SafetyFlagType(str, enum.Enum):
     HARASSMENT = "HARASSMENT"
     FRAUD = "FRAUD"
     INAPPROPRIATE = "INAPPROPRIATE"
+    MANIPULATION_RISK = "MANIPULATION_RISK"
+    AGGRESSIVE_LANGUAGE = "AGGRESSIVE_LANGUAGE"
+    PHOTO_LEAK_RISK = "PHOTO_LEAK_RISK"
+    BOUNDARY_PRESSURE = "BOUNDARY_PRESSURE"
 
 class SafetySeverity(str, enum.Enum):
     LOW = "LOW"

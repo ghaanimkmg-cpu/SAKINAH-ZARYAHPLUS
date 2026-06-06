@@ -1,96 +1,70 @@
 import pytest
-pytestmark = pytest.mark.skip(reason="Needs rewrite for DB persistence")
+import uuid
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from app.nis.models.base import NISBaseModel
+from app.nis.models.user import NISUser
+from app.nis.models.matching import NISMatchInterest, NISMatchflow
+from app.nis.enums.nis_enums import MatchInterestStatus
 from app.nis.services.mutual_interest_service import NISMutualInterestService
-from fastapi.testclient import TestClient
-from app.main import app
-from app.core.security import get_current_user
-from app.nis.schemas.auth import UserContext
 
-client = TestClient(app)
+engine = create_engine("sqlite:///:memory:")
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-@pytest.fixture(autouse=True)
-def setup_teardown():
-    # Setup state
-    NISMutualInterestService.clear_mock_state()
-    NISMutualInterestService.seed_mock_state(
-        user_status={"user_a": "VERIFIED", "user_b": "VERIFIED", "user_banned": "BANNED", "user_1": "VERIFIED"},
-        candidate_status={"cand_good": "HIGH_CONFIDENCE_MATCH", "cand_bad": "LOW_CONFIDENCE_DO_NOT_SHOW"}
-    )
-    
-    # Override dependency for this module's tests
-    def override_get_current_user():
-        return UserContext(user_id="user_1")
-    app.dependency_overrides[get_current_user] = override_get_current_user
-    
-    yield
-    
-    # Teardown state
-    NISMutualInterestService.clear_mock_state()
-    app.dependency_overrides.clear()
+@pytest.fixture(scope="function")
+def db():
+    NISBaseModel.metadata.create_all(bind=engine)
+    db_session = TestingSessionLocal()
+    yield db_session
+    db_session.close()
+    NISBaseModel.metadata.drop_all(bind=engine)
 
+def test_one_sided_interest_stays_private(db):
+    ua = uuid.uuid4()
+    ub = uuid.uuid4()
+    db.add_all([NISUser(id=ua, zaryah_user_id="a"), NISUser(id=ub, zaryah_user_id="b")])
+    db.commit()
 
-
-def test_user_can_record_private_interest():
-    res = NISMutualInterestService.record_interest("user_a", "cand_good")
+    res = NISMutualInterestService.record_interest(db, str(ua), str(ub))
     assert res.status == "INTEREST_RECORDED"
     assert res.mutual_interest is False
-    assert "privately" in res.message.lower()
+    
+    interest = db.query(NISMatchInterest).filter_by(sender_id=ua, receiver_id=ub).first()
+    assert interest.status == MatchInterestStatus.INTERESTED
 
-def test_mutual_interest_is_detected():
-    NISMutualInterestService.record_interest("user_a", "user_b")
-    # For testing mutual, user_a must also be a valid high confidence candidate for user_b
-    NISMutualInterestService.seed_mock_state({}, {"user_a": "HIGH_CONFIDENCE_MATCH"})
-    res = NISMutualInterestService.record_interest("user_b", "user_a")
+def test_mutual_interest_unlocks_matchflow_path(db):
+    ua = uuid.uuid4()
+    ub = uuid.uuid4()
+    db.add_all([NISUser(id=ua, zaryah_user_id="a"), NISUser(id=ub, zaryah_user_id="b")])
+    db.commit()
+
+    # B likes A first
+    NISMutualInterestService.record_interest(db, str(ub), str(ua))
+    
+    # A likes B
+    res = NISMutualInterestService.record_interest(db, str(ua), str(ub))
     assert res.status == "MUTUAL_INTEREST"
     assert res.mutual_interest is True
-    assert "next step will be guided" in res.message.lower()
 
-def test_silent_pass_is_recorded():
-    res = NISMutualInterestService.record_pass("user_a", "cand_good")
+def test_pass_is_silent(db):
+    ua = uuid.uuid4()
+    ub = uuid.uuid4()
+    db.add_all([NISUser(id=ua, zaryah_user_id="a"), NISUser(id=ub, zaryah_user_id="b")])
+    db.commit()
+
+    res = NISMutualInterestService.record_pass(db, str(ua), str(ub))
     assert res.status == "PASS_RECORDED"
-    assert res.mutual_interest is False
-    assert "silently" in res.message.lower()
+    
+    interest = db.query(NISMatchInterest).filter_by(sender_id=ua, receiver_id=ub).first()
+    assert interest.status == MatchInterestStatus.PASSED
 
-def test_duplicate_interest_handled_safely():
-    NISMutualInterestService.record_interest("user_a", "cand_good")
-    res = NISMutualInterestService.record_interest("user_a", "cand_good")
-    assert res.status == "INTEREST_RECORDED"
+def test_interest_after_pass_is_blocked(db):
+    ua = uuid.uuid4()
+    ub = uuid.uuid4()
+    db.add_all([NISUser(id=ua, zaryah_user_id="a"), NISUser(id=ub, zaryah_user_id="b")])
+    db.commit()
 
-def test_duplicate_pass_handled_safely():
-    NISMutualInterestService.record_pass("user_a", "cand_good")
-    res = NISMutualInterestService.record_pass("user_a", "cand_good")
-    assert res.status == "PASS_RECORDED"
-
-def test_pass_after_interest_cancels_safely():
-    NISMutualInterestService.record_interest("user_a", "cand_good")
-    res = NISMutualInterestService.record_pass("user_a", "cand_good")
-    assert res.status == "PASS_RECORDED"
-
-def test_interest_after_pass_blocked():
-    NISMutualInterestService.record_pass("user_a", "cand_good")
-    with pytest.raises(ValueError, match="Cannot express interest after passing."):
-        NISMutualInterestService.record_interest("user_a", "cand_good")
-
-def test_ineligible_user_blocked():
-    with pytest.raises(ValueError, match="User is BANNED"):
-        NISMutualInterestService.record_interest("user_banned", "cand_good")
-
-def test_interest_only_works_for_approved_candidates():
-    with pytest.raises(ValueError, match="Candidate is not approved"):
-        NISMutualInterestService.record_interest("user_a", "cand_bad")
-
-def test_no_who_liked_you_or_rejection_data():
-    res = NISMutualInterestService.record_interest("user_a", "cand_good")
-    dump = res.model_dump_json().lower()
-    assert "rejected" not in dump
-    assert "who liked you" not in dump
-
-def test_api_express_interest():
-    response = client.post("/api/v1/nis/candidates/cand_good/interest")
-    assert response.status_code == 200
-    assert response.json()["status"] == "INTEREST_RECORDED"
-
-def test_api_express_pass():
-    response = client.post("/api/v1/nis/candidates/cand_good/pass")
-    assert response.status_code == 200
-    assert response.json()["status"] == "PASS_RECORDED"
+    NISMutualInterestService.record_pass(db, str(ua), str(ub))
+    
+    with pytest.raises(ValueError, match="Cannot express interest after passing"):
+        NISMutualInterestService.record_interest(db, str(ua), str(ub))

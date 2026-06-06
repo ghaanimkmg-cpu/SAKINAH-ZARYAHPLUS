@@ -65,3 +65,19 @@ If the frontend attempts to make an API call and the backend is unreachable (e.g
   3. Ensure the frontend is being accessed via `http://localhost:5173` so the proxy can correctly route `/api` and `/health` requests to `127.0.0.1:8000`.
 
 To stop the development servers, simply close the two newly opened terminal windows.
+
+## Troubleshooting Build Issues
+
+If building for production (`npm run build`) or running Vite encounters an out-of-memory error (e.g. `fatal error: out of memory`), you must increase the Node.js memory limit:
+
+**Windows PowerShell:**
+```powershell
+$env:NODE_OPTIONS="--max-old-space-size=4096"
+npm run build
+```
+
+**Linux/macOS:**
+```bash
+export NODE_OPTIONS="--max-old-space-size=4096"
+npm run build
+```

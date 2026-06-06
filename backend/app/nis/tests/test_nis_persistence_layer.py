@@ -89,7 +89,7 @@ def test_full_nis_persistence_layer(db):
     assert db.query(NISMatchflow).first().current_step == "MUTUAL_INTEREST"
 
     # Conversation
-    conv = NISStructuredConversation(matchflow_id=mf.id, topic_unlocked="PARENTS_AND_FAMILY")
+    conv = NISStructuredConversation(matchflow_id=mf.id, current_topic="PARENTS_AND_FAMILY")
     db.add(conv)
     db.commit()
     
