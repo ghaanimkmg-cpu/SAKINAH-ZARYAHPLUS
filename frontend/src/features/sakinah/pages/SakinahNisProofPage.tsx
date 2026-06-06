@@ -85,14 +85,26 @@ export const SakinahNisProofPage: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
           
           <SakinahCard variant="premium" title="Proof Status">
-            <SakinahMetaRow label="Current demo user" value={report.current_user} />
-            <SakinahMetaRow 
-              label="NIS proof status" 
-              value={report.nis_passed ? 'PASSED' : 'FAILED'} 
-              valueStyle={{ color: report.nis_passed ? 'var(--sakinah-success, #4CAF50)' : 'var(--sakinah-error, #f44336)', fontWeight: 600 }}
-            />
-            <SakinahMetaRow label="Backend authority" value="Enabled" />
-            <SakinahMetaRow label="Frontend decision-making" value="Disabled" />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', color: 'var(--sakinah-text-muted)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Current demo user:</span>
+                <span style={{ color: 'var(--sakinah-text)' }}>{report.current_user}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>NIS proof status:</span>
+                <span style={{ color: report.nis_passed ? 'var(--sakinah-success, #4CAF50)' : 'var(--sakinah-error, #f44336)', fontWeight: 600 }}>
+                  {report.nis_passed ? 'PASSED' : 'FAILED'}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Backend authority:</span>
+                <span style={{ color: 'var(--sakinah-text)' }}>Enabled</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Frontend decision-making:</span>
+                <span style={{ color: 'var(--sakinah-text)' }}>Disabled</span>
+              </div>
+            </div>
           </SakinahCard>
 
           <div>
@@ -124,7 +136,9 @@ export const SakinahNisProofPage: React.FC = () => {
                       Actual: {r.actual}
                     </div>
                   </div>
-                  <SakinahMetaRow label="Reason" value={r.reason} />
+                  <div style={{ color: 'var(--sakinah-text-muted)', fontSize: '0.9rem' }}>
+                    <strong>Reason:</strong> {r.reason}
+                  </div>
                 </SakinahCard>
               ))}
             </div>
