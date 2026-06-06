@@ -1,0 +1,163 @@
+@import "@fontsource/cormorant-garamond/400.css";
+@import "@fontsource/cormorant-garamond/500.css";
+@import "@fontsource/cormorant-garamond/400-italic.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/500.css";
+@import "@fontsource/manrope/300.css";
+@import "@fontsource/manrope/400.css";
+@import "@fontsource/manrope/500.css";
+@import "@fontsource/manrope/600.css";
+@import "@fontsource/manrope/700.css";
+
+/* Sakinah Theme Variables */
+:root {
+  --sk-bg: #07090f;
+  --sk-bg2: #0b0f18;
+  --sk-panel: #111826;
+  --sk-panel2: #0f1521;
+  --sk-line: rgba(212,168,83,.16);
+  --sk-line-soft: rgba(255,255,255,.06);
+  --sk-gold: #D4A853;
+  --sk-gold-soft: #e7c984;
+  --sk-gold-dim: rgba(212,168,83,.55);
+  --sk-ink: #EDE7DA;
+  --sk-ink-dim: #9aa0ac;
+  --sk-ink-faint: #5f6675;
+  --sk-green: #7FB07A;
+  --sk-rose: #C98A8A;
+  --sk-blue: #8fa9c9;
+  --sk-shadow: 0 30px 60px -20px rgba(0,0,0,.8);
+  --sk-radius: 22px;
+}
+
+/* Base Wrapper for Sakinah Screens */
+.sk-viewport {
+  background: radial-gradient(1200px 800px at 50% -10%, rgba(212,168,83,.07), transparent 60%), var(--sk-bg);
+  color: var(--sk-ink);
+  font-family: 'Manrope', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Animations */
+.sk-fx {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: sk-rise .5s ease forwards;
+}
+@keyframes sk-rise {
+  to { opacity: 1; transform: none; }
+}
+.sk-d1 { animation-delay: .04s; }
+.sk-d2 { animation-delay: .12s; }
+.sk-d3 { animation-delay: .2s; }
+.sk-d4 { animation-delay: .28s; }
+.sk-d5 { animation-delay: .36s; }
+.sk-d6 { animation-delay: .44s; }
+
+/* Breathing Orb */
+.sk-b-orb {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 46% 42%, #fde6b8, #d9a948 38%, #7c5e22 72%, transparent 78%);
+  position: relative;
+  margin: 0 auto 30px;
+  animation: sk-breathe 5s ease-in-out infinite;
+}
+.sk-b-orb::after {
+  content: "";
+  position: absolute;
+  inset: -22px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,168,83,.22), transparent 68%);
+  animation: sk-breathe 5s ease-in-out infinite;
+}
+@keyframes sk-breathe {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.06); filter: brightness(1.12); }
+}
+
+/* Common Layout Elements */
+.sk-screen-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0 14px;
+}
+.sk-back {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--sk-line);
+  background: transparent;
+  color: var(--sk-gold);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: .2s;
+}
+.sk-back:hover {
+  background: rgba(212,168,83,.1);
+}
+.sk-ttl {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 500;
+}
+.sk-sub {
+  font-size: 11px;
+  color: var(--sk-ink-faint);
+  margin-top: 1px;
+}
+
+/* Buttons */
+.sk-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: .3px;
+  padding: 15px;
+  border-radius: 15px;
+  transition: .22s;
+  margin-top: 6px;
+}
+.sk-btn-gold {
+  background: linear-gradient(135deg, var(--sk-gold), #b98b39);
+  color: #0a0e15;
+}
+.sk-btn-gold:hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+.sk-btn-ghost {
+  background: transparent;
+  border: 1px solid var(--sk-line);
+  color: var(--sk-gold-soft);
+}
+.sk-btn-ghost:hover {
+  background: rgba(212,168,83,.06);
+}
+.sk-btn-sm {
+  padding: 12px;
+  font-size: 13px;
+  border-radius: 13px;
+}
+
+/* Typography Helpers */
+.sk-font-serif {
+  font-family: 'Cormorant Garamond', serif;
+}
+.sk-font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}

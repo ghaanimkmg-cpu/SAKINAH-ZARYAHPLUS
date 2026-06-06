@@ -15,22 +15,23 @@ export const SakinahButton: React.FC<SakinahButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyles = "inline-flex items-center justify-center font-serif font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#07090f] disabled:opacity-50 disabled:cursor-not-allowed";
+  const baseStyles = "sk-btn";
   
   const sizeStyles = {
-    sm: "py-[10px] px-4 text-[14px] rounded-[10px]",
-    md: "py-[14px] px-6 text-[16px] rounded-[14px]",
-    lg: "py-[16px] px-8 text-[20px] rounded-[14px]"
+    sm: "sk-btn-sm",
+    md: "",
+    lg: "text-[16px] py-[18px]", // reference mostly uses default and sm
   };
 
+  // Map our generic variants to the specific reference UI classes
   const variantStyles = {
-    primary: "bg-[#D4A853] text-[#07090f] hover:bg-[#ebd097] focus:ring-[#D4A853]",
-    secondary: "bg-transparent border border-[#D4A853] text-[#D4A853] hover:bg-[rgba(212,168,83,0.1)] focus:ring-[#D4A853]",
-    danger: "bg-transparent border border-[rgba(201,138,138,0.3)] text-[#C98A8A] font-sans hover:bg-[rgba(201,138,138,0.1)] focus:ring-[#C98A8A]",
-    ghost: "bg-transparent text-[#9aa0ac] hover:text-[#EDE7DA] hover:bg-[rgba(255,255,255,0.03)] focus:ring-[rgba(255,255,255,0.1)]"
+    primary: "sk-btn-gold",
+    secondary: "sk-btn-ghost border-[var(--sk-gold)] text-[var(--sk-gold)]", 
+    danger: "sk-btn-ghost border-[rgba(201,138,138,0.3)] text-[#C98A8A] hover:bg-[rgba(201,138,138,0.1)]",
+    ghost: "sk-btn-ghost",
   };
 
-  const widthStyle = fullWidth ? "w-full" : "";
+  const widthStyle = fullWidth ? "w-full" : "w-auto px-8";
 
   return (
     <button
