@@ -275,6 +275,139 @@
   text-transform: uppercase;
 }
 
+/* Candidate Pool Card */
+.sk-pool-card {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  border: 1px solid var(--sk-line-soft);
+  border-radius: 17px;
+  padding: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: .22s;
+  background: rgba(255, 255, 255, 0.012);
+}
+.sk-pool-card:hover {
+  border-color: var(--sk-gold);
+  transform: translateX(3px);
+}
+.sk-pool-card .pool-aura {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: radial-gradient(circle at 40% 35%, rgba(201, 138, 138, 0.4), transparent 55%), radial-gradient(circle at 70% 70%, rgba(212, 168, 83, 0.32), transparent 55%), #0f1521;
+  border: 1px solid var(--sk-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px;
+  color: var(--sk-ink);
+}
+.sk-pool-card .tx {
+  flex: 1;
+}
+.sk-pool-card .tx b {
+  font-size: 14.5px;
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+}
+.sk-pool-card .tx .mt {
+  font-size: 10px;
+  color: var(--sk-ink-faint);
+  margin: 1px 0 4px;
+}
+.sk-pool-card .tx .rz {
+  font-size: 11px;
+  color: var(--sk-gold-soft);
+  font-weight: 300;
+}
+.sk-pool-card .arr {
+  color: var(--sk-ink-faint);
+  font-size: 17px;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+/* Active Banner */
+.sk-active-banner {
+  background: rgba(212, 168, 83, 0.05);
+  border: 1px solid var(--sk-line);
+  border-radius: 13px;
+  padding: 11px 13px;
+  font-size: 11.5px;
+  color: var(--sk-gold-soft);
+  font-weight: 300;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Candidate Card */
+.sk-cand-card {
+  background: linear-gradient(165deg, var(--sk-panel), var(--sk-panel2));
+  border: 1px solid var(--sk-line);
+  border-radius: 24px;
+  padding: 24px 22px;
+  position: relative;
+  overflow: hidden;
+}
+.cand-aura {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  margin: 2px auto 10px;
+  background: radial-gradient(circle at 40% 35%, rgba(201, 138, 138, 0.42), transparent 55%), radial-gradient(circle at 70% 70%, rgba(212, 168, 83, 0.34), transparent 55%), #0f1521;
+  border: 1px solid var(--sk-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 30px;
+  color: var(--sk-ink);
+}
+.cand-name {
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+}
+.cand-meta {
+  text-align: center;
+  font-size: 10.5px;
+  color: var(--sk-ink-faint);
+  margin-top: 3px;
+}
+.sk-resonance {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px 0 16px;
+}
+.sk-resonance .res {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--sk-ink-dim);
+  font-weight: 300;
+}
+.sk-resonance .res .tk {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sk-gold);
+  flex-shrink: 0;
+  box-shadow: 0 0 8px var(--sk-gold-dim);
+}
+.sk-no-face {
+  text-align: center;
+  font-size: 10px;
+  color: var(--sk-ink-faint);
+  font-weight: 300;
+  font-style: italic;
+  margin: 16px 0 6px;
+}
+
 /* Journey Stepper */
 .sk-journey { display: flex; flex-direction: column; }
 .sk-jstep { display: flex; gap: 13px; cursor: pointer; }
