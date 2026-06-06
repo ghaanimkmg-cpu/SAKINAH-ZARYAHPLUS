@@ -1,4 +1,4 @@
-import { CandidateSummary, ConsideredFewResponse, ConversationTopic } from '../types/sakinah.types';
+import type { CandidateSummary, ConsideredFewResponse, ConversationTopic } from '../types/sakinah.types';
 
 export const mockCandidates: CandidateSummary[] = [
   {

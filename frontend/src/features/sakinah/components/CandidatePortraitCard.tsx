@@ -1,5 +1,5 @@
 import React from 'react';
-import { CandidateSummary } from '../types/sakinah.types';
+import type { CandidateSummary } from '../types/sakinah.types';
 
 interface CandidatePortraitCardProps {
   candidate: CandidateSummary;

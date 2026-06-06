@@ -3,11 +3,10 @@ import {
   SakinahShell, 
   SakinahHeader, 
   ConversationTopicList, 
-  ConversationMessageList,
   SafetyNotice,
   RayaScriptCard
 } from '../components';
-import { ConversationTopic } from '../types/sakinah.types';
+import type { ConversationTopic } from '../types/sakinah.types';
 
 export const SakinahConversationPage: React.FC = () => {
   // Hardcoded standard topics reflecting the safe, structured curriculum.
