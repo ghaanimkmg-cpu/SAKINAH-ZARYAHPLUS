@@ -380,6 +380,11 @@ const SakinahRolePage = lazy(() => import('@/features/sakinah/pages/SakinahRoleP
 const SakinahPrimerPage = lazy(() => import('@/features/sakinah/pages/SakinahPrimerPage').then(m => ({ default: m.SakinahPrimerPage })));
 const SakinahKycPage = lazy(() => import('@/features/sakinah/pages/SakinahKycPage').then(m => ({ default: m.SakinahKycPage })));
 const SakinahLivenessPage = lazy(() => import('@/features/sakinah/pages/SakinahLivenessPage').then(m => ({ default: m.SakinahLivenessPage })));
+const SakinahHomePage = lazy(() => import('@/features/sakinah/pages/SakinahHomePage').then(m => ({ default: m.SakinahHomePage })));
+const SakinahNiyyahPage = lazy(() => import('@/features/sakinah/pages/SakinahNiyyahPage').then(m => ({ default: m.SakinahNiyyahPage })));
+const SakinahValuesPage = lazy(() => import('@/features/sakinah/pages/SakinahValuesPage').then(m => ({ default: m.SakinahValuesPage })));
+const SakinahMirrorPage = lazy(() => import('@/features/sakinah/pages/SakinahMirrorPage').then(m => ({ default: m.SakinahMirrorPage })));
+const SakinahPortraitPage = lazy(() => import('@/features/sakinah/pages/SakinahPortraitPage').then(m => ({ default: m.SakinahPortraitPage })));
 const SakinahEligibilityPage = lazy(() => import('@/features/sakinah/pages/SakinahEligibilityPage').then(m => ({ default: m.SakinahEligibilityPage })));
 const SakinahProfileSignalsPage = lazy(() => import('@/features/sakinah/pages/SakinahProfileSignalsPage').then(m => ({ default: m.SakinahProfileSignalsPage })));
 const SakinahPreferencesPage = lazy(() => import('@/features/sakinah/pages/SakinahPreferencesPage').then(m => ({ default: m.SakinahPreferencesPage })));
@@ -815,6 +820,11 @@ export const router = createBrowserRouter([
       { path: 'sakinah/primer', element: <LazyPage Component={SakinahPrimerPage} /> },
       { path: 'sakinah/kyc', element: <LazyPage Component={SakinahKycPage} /> },
       { path: 'sakinah/liveness', element: <LazyPage Component={SakinahLivenessPage} /> },
+      { path: 'sakinah/home', element: <LazyPage Component={SakinahHomePage} /> },
+      { path: 'sakinah/niyyah', element: <LazyPage Component={SakinahNiyyahPage} /> },
+      { path: 'sakinah/values', element: <LazyPage Component={SakinahValuesPage} /> },
+      { path: 'sakinah/mirror', element: <LazyPage Component={SakinahMirrorPage} /> },
+      { path: 'sakinah/portrait', element: <LazyPage Component={SakinahPortraitPage} /> },
       { path: 'sakinah/eligibility', element: <LazyPage Component={SakinahEligibilityPage} /> },
       { path: 'sakinah/profile', element: <LazyPage Component={SakinahProfileSignalsPage} /> },
       { path: 'sakinah/preferences', element: <LazyPage Component={SakinahPreferencesPage} /> },
@@ -824,8 +834,6 @@ export const router = createBrowserRouter([
       { path: 'sakinah/conversation/:conversationId', element: <LazyPage Component={SakinahConversationPage} /> },
       { path: 'sakinah/decision/:matchflowId', element: <LazyPage Component={SakinahDecisionPage} /> },
       { path: 'sakinah/safety', element: <LazyPage Component={SakinahSafetyPage} /> },
-      // Added fallback for home button navigation at the end of liveness
-      { path: 'sakinah/home', element: <Navigate to="/sakinah/considered-few" replace /> },
     ],
   },
 
