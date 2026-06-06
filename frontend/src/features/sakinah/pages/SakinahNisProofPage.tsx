@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { SakinahJourneyFrame } from '../components/SakinahJourneyFrame';
 import { SakinahCard } from '../components/SakinahCard';
 import { SakinahNotice } from '../components/SakinahNotice';
-import { SakinahMetaRow } from '../components/SakinahMetaRow';
 import { DevFallbackBadge } from '../components/DevFallbackBadge';
 import { getNisProofReport } from '../services/sakinahApi';
 
@@ -58,118 +57,104 @@ export const SakinahNisProofPage: React.FC = () => {
   };
 
   return (
-    <SakinahJourneyFrame
-      title="NIS Practical Proof Report"
-      subtitle="A controlled backend demonstration showing how NIS accepts or blocks candidates."
-      currentStep={1}
-      totalSteps={1}
-      hideProgress
-    >
-      <div style={{ marginBottom: '24px' }}>
-        <DevFallbackBadge message="Development Proof Mode: This page is for internal demo/testing only and must not be exposed in production." />
-      </div>
-
-      {loading && (
-        <SakinahCard variant="ghost">
-          <p style={{ textAlign: 'center', color: 'var(--sakinah-text-muted)' }}>Executing NIS Proof Engine...</p>
-        </SakinahCard>
-      )}
-
-      {error && (
-        <SakinahNotice title="Production Safety Active" intent="warning">
-          {error}
-        </SakinahNotice>
-      )}
-
-      {report && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-          
-          <SakinahCard variant="premium" title="Proof Status">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', color: 'var(--sakinah-text-muted)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Current demo user:</span>
-                <span style={{ color: 'var(--sakinah-text)' }}>{report.current_user}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>NIS proof status:</span>
-                <span style={{ color: report.nis_passed ? 'var(--sakinah-success, #4CAF50)' : 'var(--sakinah-error, #f44336)', fontWeight: 600 }}>
-                  {report.nis_passed ? 'PASSED' : 'FAILED'}
-                </span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Backend authority:</span>
-                <span style={{ color: 'var(--sakinah-text)' }}>Enabled</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Frontend decision-making:</span>
-                <span style={{ color: 'var(--sakinah-text)' }}>Disabled</span>
-              </div>
-            </div>
-          </SakinahCard>
-
-          <div>
-            <h3 style={{ color: 'var(--sakinah-gold)', marginBottom: '16px', fontSize: '1.2rem', fontWeight: 600 }}>Candidate Outcomes</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {report.results.map((r, idx) => (
-                <SakinahCard key={idx} variant="bordered" title={humanLabels[r.candidate_id] || r.candidate_id}>
-                  <div style={{ display: 'flex', gap: '16px', marginBottom: '12px', flexWrap: 'wrap' }}>
-                    <div style={{ 
-                      padding: '4px 8px', 
-                      borderRadius: '4px', 
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: `1px solid ${getBadgeColor(r.expected, r.actual)}`,
-                      color: getBadgeColor(r.expected, r.actual),
-                      fontSize: '0.85rem',
-                      fontWeight: 500
-                    }}>
-                      Expected: {r.expected}
-                    </div>
-                    <div style={{ 
-                      padding: '4px 8px', 
-                      borderRadius: '4px', 
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      border: `1px solid ${getBadgeColor(r.expected, r.actual)}`,
-                      color: getBadgeColor(r.expected, r.actual),
-                      fontSize: '0.85rem',
-                      fontWeight: 500
-                    }}>
-                      Actual: {r.actual}
-                    </div>
-                  </div>
-                  <div style={{ color: 'var(--sakinah-text-muted)', fontSize: '0.9rem' }}>
-                    <strong>Reason:</strong> {r.reason}
-                  </div>
-                </SakinahCard>
-              ))}
-            </div>
-          </div>
-
-          <SakinahCard variant="ghost" title="How this proves NIS is working">
-            <ol style={{ paddingLeft: '20px', margin: 0, color: 'var(--sakinah-text-muted)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <li>NIS receives multiple controlled candidates.</li>
-              <li>It does not show everyone.</li>
-              <li>It applies hard filters first.</li>
-              <li>It checks psychological pair dynamics.</li>
-              <li>It applies confidence/no-match rules.</li>
-              <li>It only allows candidates that pass.</li>
-              <li>The frontend only displays backend-approved results.</li>
-            </ol>
-          </SakinahCard>
-
-          <SakinahNotice title="Privacy Proof" intent="info">
-            <ul style={{ paddingLeft: '20px', margin: 0, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <li>No Aadhaar</li>
-              <li>No selfie</li>
-              <li>No raw Raya conversation</li>
-              <li>No raw Barakah entries</li>
-              <li>No compatibility percentage</li>
-              <li>No spiritual score</li>
-              <li>No "perfect match" claim</li>
-            </ul>
-          </SakinahNotice>
-
+    <SakinahJourneyFrame>
+      <div className="flex flex-col gap-8 pb-12">
+        <div className="text-center space-y-4">
+          <h1 className="text-3xl font-light tracking-tight text-[#F5E8C7]">NIS Practical Proof Report</h1>
+          <p className="text-[#8D8673]">A controlled backend demonstration showing how NIS accepts or blocks candidates.</p>
         </div>
-      )}
+
+        <div className="mb-6">
+          <DevFallbackBadge message="Development Proof Mode: This page is for internal demo/testing only and must not be exposed in production." />
+        </div>
+
+        {loading && (
+          <SakinahCard className="flex items-center justify-center min-h-[120px]">
+            <p className="text-[#8D8673]">Executing NIS Proof Engine...</p>
+          </SakinahCard>
+        )}
+
+        {error && (
+          <SakinahNotice 
+            icon="⚠️" 
+            title="Production Safety Active" 
+            message={error} 
+          />
+        )}
+
+        {report && (
+          <div className="flex flex-col gap-8">
+            
+            <SakinahCard glow>
+              <h2 className="text-xl text-[#F5E8C7] mb-6 font-medium">Proof Status</h2>
+              <div className="flex flex-col gap-4 text-[#8D8673]">
+                <div className="flex justify-between items-center pb-4 border-b border-[rgba(255,255,255,0.05)]">
+                  <span>Current demo user:</span>
+                  <span className="text-[#F5E8C7]">{report.current_user}</span>
+                </div>
+                <div className="flex justify-between items-center pb-4 border-b border-[rgba(255,255,255,0.05)]">
+                  <span>NIS proof status:</span>
+                  <span style={{ color: report.nis_passed ? '#4CAF50' : '#f44336', fontWeight: 600 }}>
+                    {report.nis_passed ? 'PASSED' : 'FAILED'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center pb-4 border-b border-[rgba(255,255,255,0.05)]">
+                  <span>Backend authority:</span>
+                  <span className="text-[#F5E8C7]">Enabled</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Frontend decision-making:</span>
+                  <span className="text-[#F5E8C7]">Disabled</span>
+                </div>
+              </div>
+            </SakinahCard>
+
+            <div>
+              <h3 className="text-[#D4A853] mb-4 text-lg font-medium">Candidate Outcomes</h3>
+              <div className="flex flex-col gap-4">
+                {report.results.map((r, idx) => (
+                  <SakinahCard key={idx}>
+                    <h4 className="text-[#F5E8C7] text-lg mb-4">{humanLabels[r.candidate_id] || r.candidate_id}</h4>
+                    <div className="flex gap-4 mb-4 flex-wrap">
+                      <div className="px-3 py-1.5 rounded bg-[rgba(255,255,255,0.03)] border text-sm font-medium"
+                           style={{ borderColor: getBadgeColor(r.expected, r.actual), color: getBadgeColor(r.expected, r.actual) }}>
+                        Expected: {r.expected}
+                      </div>
+                      <div className="px-3 py-1.5 rounded bg-[rgba(255,255,255,0.03)] border text-sm font-medium"
+                           style={{ borderColor: getBadgeColor(r.expected, r.actual), color: getBadgeColor(r.expected, r.actual) }}>
+                        Actual: {r.actual}
+                      </div>
+                    </div>
+                    <div className="text-[#8D8673] text-sm leading-relaxed">
+                      <strong className="text-[#D4A853]">Reason:</strong> {r.reason}
+                    </div>
+                  </SakinahCard>
+                ))}
+              </div>
+            </div>
+
+            <SakinahCard>
+              <h2 className="text-[#F5E8C7] text-lg mb-4 font-medium">How this proves NIS is working</h2>
+              <ol className="list-decimal pl-5 space-y-2 text-[#8D8673]">
+                <li>NIS receives multiple controlled candidates.</li>
+                <li>It does not show everyone.</li>
+                <li>It applies hard filters first.</li>
+                <li>It checks psychological pair dynamics.</li>
+                <li>It applies confidence/no-match rules.</li>
+                <li>It only allows candidates that pass.</li>
+                <li>The frontend only displays backend-approved results.</li>
+              </ol>
+            </SakinahCard>
+
+            <SakinahNotice 
+              icon="🔒"
+              title="Privacy Proof" 
+              message="No Aadhaar, No selfie, No raw Raya conversation, No raw Barakah entries, No compatibility percentage, No spiritual score, No perfect match claim."
+            />
+
+          </div>
+        )}
+      </div>
     </SakinahJourneyFrame>
   );
 };
