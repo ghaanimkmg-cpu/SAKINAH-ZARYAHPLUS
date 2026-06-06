@@ -52,14 +52,178 @@ class NISConsideredFewService:
         )
 
     @classmethod
-    def get_considered_few(cls, user_id: str) -> ConsideredFewResponse:
+    def get_considered_few(cls, db: Session, user_id: str) -> ConsideredFewResponse:
+        from app.nis.services.hard_filter_engine import NISHardFilterEngine, FilterCandidateState, FilterPreferences
+        from app.nis.services.compatibility_engine import NISCompatibilityEngine
+        from app.nis.services.confidence_threshold_service import NISConfidenceThresholdService, CandidateInputs
+        from app.nis.models.user import NISUser
+        from app.nis.models.profiles import NISUserSignalProfile
+        from app.nis.models.preferences import NISMatchPreference
+        import uuid
+
+        # Convert user_id
+        try:
+            u_uuid = uuid.UUID(user_id)
+        except ValueError:
+            u_uuid = uuid.uuid4()
+
+        # 1. Fetch current user data
+        current_user = db.query(NISUser).filter_by(id=u_uuid).first()
+        current_profile = db.query(NISUserSignalProfile).filter_by(user_id=u_uuid).first()
+        current_prefs = db.query(NISMatchPreference).filter_by(user_id=u_uuid).first()
+
+        if not current_user or not current_profile or not current_prefs:
+            return ConsideredFewResponse(
+                status="NO_SUITABLE_MATCHES_RIGHT_NOW",
+                candidates=[],
+                message="Please complete your profile and preferences to see matches."
+            )
+
+        # Build current user state and prefs
+        # Note: mapping DB models to filter engine models (simplified for Phase K)
+        def _get_float_str(val):
+            if val is None: return "UNKNOWN"
+            if val >= 0.8: return "HIGH"
+            if val <= 0.3: return "LOW"
+            return "STEADY" # moderate/steady
+
+        from app.nis.schemas.user_signal_profile import UserSignalProfile
+        user_prof_schema = UserSignalProfile(
+            emotional_steadiness=_get_float_str(current_profile.emotional_steadiness),
+            communication_style="DIRECT", # Using defaults for fields that might be missing in Phase K
+            conflict_repair_style="PROACTIVE",
+            deen_alignment="STRONG",
+            family_responsibility="HIGH",
+            marriage_readiness="READY",
+            financial_expectation="MODERATE",
+            life_direction="BUILDING",
+            wali_comfort="COMFORTABLE",
+            social_lifestyle="BALANCED",
+            self_awareness_level="HIGH"
+        )
+
+        user_state = FilterCandidateState(
+            is_verified=(current_user.eligibility_status == "VERIFIED"),
+            is_banned=(current_user.eligibility_status == "BANNED"),
+            is_under_review=(current_user.eligibility_status == "HUMAN_REVIEW_REQUIRED"),
+            has_profile=True,
+            has_preferences=True,
+            age=28, # Placeholder
+            active_conversations=0,
+            location="Unknown",
+            timeline="1_YEAR",
+            tradition="Sunni",
+            wali="REQUIRED",
+            marital_status="NEVER_MARRIED",
+            relocation_openness="OPEN"
+        )
+        
+        user_filter_prefs = FilterPreferences(
+            age_min=current_prefs.age_range_min or 18,
+            age_max=current_prefs.age_range_max or 100,
+            location_pref=current_prefs.location_preference or "ANY",
+            timeline_pref=current_prefs.nikah_timeline or "ANY",
+            tradition_pref=current_prefs.tradition_preference or "ANY",
+            wali_pref=current_prefs.wali_involvement_preference or "ANY",
+            marital_status_pref=current_prefs.marital_status_preference or "ANY"
+        )
+
+        # 2. Fetch candidates from DB
+        # For Phase K, we just query all other users
+        candidates_db = db.query(NISUser).filter(NISUser.id != u_uuid).limit(50).all()
+        
+        inputs = []
+        for c_user in candidates_db:
+            c_profile = db.query(NISUserSignalProfile).filter_by(user_id=c_user.id).first()
+            c_prefs = db.query(NISMatchPreference).filter_by(user_id=c_user.id).first()
+            
+            c_state = FilterCandidateState(
+                is_verified=(c_user.eligibility_status == "VERIFIED"),
+                is_banned=(c_user.eligibility_status == "BANNED"),
+                is_under_review=(c_user.eligibility_status == "HUMAN_REVIEW_REQUIRED"),
+                has_profile=(c_profile is not None),
+                has_preferences=(c_prefs is not None),
+                age=25, # Placeholder
+                active_conversations=0,
+                location="Unknown",
+                timeline="1_YEAR",
+                tradition="Sunni",
+                wali="REQUIRED",
+                marital_status="NEVER_MARRIED",
+                relocation_openness="OPEN"
+            )
+            
+            if c_prefs:
+                c_filter_prefs = FilterPreferences(
+                    age_min=c_prefs.age_range_min or 18,
+                    age_max=c_prefs.age_range_max or 100,
+                    location_pref=c_prefs.location_preference or "ANY",
+                    timeline_pref=c_prefs.nikah_timeline or "ANY",
+                    tradition_pref=c_prefs.tradition_preference or "ANY",
+                    wali_pref=c_prefs.wali_involvement_preference or "ANY",
+                    marital_status_pref=c_prefs.marital_status_preference or "ANY"
+                )
+            else:
+                c_filter_prefs = FilterPreferences(18, 100, "ANY", "ANY", "ANY", "ANY", "ANY")
+                
+            if c_profile:
+                c_prof_schema = UserSignalProfile(
+                    emotional_steadiness=_get_float_str(c_profile.emotional_steadiness),
+                    communication_style="DIRECT",
+                    conflict_repair_style="PROACTIVE",
+                    deen_alignment="STRONG",
+                    family_responsibility="HIGH",
+                    marriage_readiness="READY",
+                    financial_expectation="MODERATE",
+                    life_direction="BUILDING",
+                    wali_comfort="COMFORTABLE",
+                    social_lifestyle="BALANCED",
+                    self_awareness_level="HIGH"
+                )
+            else:
+                c_prof_schema = UserSignalProfile(
+                    emotional_steadiness="UNKNOWN", communication_style="UNKNOWN", conflict_repair_style="UNKNOWN",
+                    deen_alignment="UNKNOWN", family_responsibility="UNKNOWN", marriage_readiness="UNKNOWN",
+                    financial_expectation="UNKNOWN", life_direction="UNKNOWN", wali_comfort="UNKNOWN", social_lifestyle="UNKNOWN",
+                    self_awareness_level="UNKNOWN"
+                )
+
+            # 1. Hard Filter Engine
+            hard_result = NISHardFilterEngine.evaluate(
+                user_state, user_filter_prefs, c_state, c_filter_prefs
+            )
+            
+            # 2. Compatibility Engine
+            comp_result = NISCompatibilityEngine.evaluate(user_prof_schema, c_prof_schema)
+
+            # 3. Confidence Threshold
+            conf_input = CandidateInputs(
+                candidate_user_id=str(c_user.id),
+                hard_filter_result=hard_result,
+                compatibility_result=comp_result,
+                safety_risk_level="LOW", # Placeholder
+                profile_data_complete=c_state.has_profile,
+                preference_data_complete=c_state.has_preferences
+            )
+            conf_result = NISConfidenceThresholdService.evaluate_candidate(conf_input)
+
+            inputs.append(ConsideredFewInput(
+                confidence_result=conf_result,
+                shared_strengths=comp_result.shared_strengths,
+                possible_tension_points=comp_result.possible_tension_points
+            ))
+
+        # 4. Generate Pool
+        return cls.generate_pool(inputs)
+
+    @classmethod
+    def _get_demo_considered_few(cls, user_id: str) -> ConsideredFewResponse:
         from app.nis.services.hard_filter_engine import NISHardFilterEngine, FilterCandidateState, FilterPreferences
         from app.nis.services.compatibility_engine import NISCompatibilityEngine
         from app.nis.schemas.user_signal_profile import UserSignalProfile
         from app.nis.services.confidence_threshold_service import NISConfidenceThresholdService, CandidateInputs
 
         # MOCK USER REPOSITORY FOR DEVELOPMENT/TESTING
-        # In a real system, this fetches from the DB.
         user_state = FilterCandidateState(
             is_verified=True, is_banned=False, is_under_review=False,
             has_profile=True, has_preferences=True,
@@ -94,8 +258,7 @@ class NISConsideredFewService:
                     self_awareness_level="HIGH", anger_intensity="MODERATE", attachment_needs="SECURE", ego_humility="BALANCED",
                     financial_responsibility="BALANCED", boundary_respect="RESPECTFUL", stability_risk="LOW"
                 ),
-                "safety": "LOW",
-                "expected": "SHOWN"
+                "safety": "LOW"
             },
             {
                 "id": "demo_candidate_banned",
@@ -111,8 +274,7 @@ class NISConsideredFewService:
                     financial_expectation="MODERATE", life_direction="BUILDING", wali_comfort="COMFORTABLE", social_lifestyle="BALANCED",
                     self_awareness_level="HIGH"
                 ),
-                "safety": "HIGH",
-                "expected": "BLOCKED"
+                "safety": "HIGH"
             },
             {
                 "id": "demo_candidate_angry",
@@ -129,8 +291,7 @@ class NISConsideredFewService:
                     self_awareness_level="HIGH", anger_intensity="HIGH", attachment_needs="SECURE", ego_humility="BALANCED",
                     financial_responsibility="BALANCED", boundary_respect="RESPECTFUL", stability_risk="LOW"
                 ),
-                "safety": "LOW",
-                "expected": "BLOCKED"
+                "safety": "LOW"
             },
             {
                 "id": "demo_candidate_age_mismatch",
@@ -146,8 +307,7 @@ class NISConsideredFewService:
                     financial_expectation="MODERATE", life_direction="BUILDING", wali_comfort="COMFORTABLE", social_lifestyle="BALANCED",
                     self_awareness_level="HIGH"
                 ),
-                "safety": "LOW",
-                "expected": "BLOCKED"
+                "safety": "LOW"
             },
             {
                 "id": "demo_candidate_weak",
@@ -163,8 +323,7 @@ class NISConsideredFewService:
                     financial_expectation="HIGH", life_direction="UNDEFINED", wali_comfort="UNCOMFORTABLE", social_lifestyle="VERY_SOCIAL",
                     self_awareness_level="LOW"
                 ),
-                "safety": "LOW",
-                "expected": "BLOCKED"
+                "safety": "LOW"
             },
             {
                 "id": "demo_candidate_insufficient",
@@ -180,8 +339,7 @@ class NISConsideredFewService:
                     financial_expectation="UNKNOWN", life_direction="UNKNOWN", wali_comfort="UNKNOWN", social_lifestyle="UNKNOWN",
                     self_awareness_level="UNKNOWN"
                 ),
-                "safety": "LOW",
-                "expected": "BLOCKED"
+                "safety": "LOW"
             }
         ]
 
@@ -217,32 +375,9 @@ class NISConsideredFewService:
 
     @classmethod
     def generate_proof_report(cls, user_id: str):
-        from app.nis.services.hard_filter_engine import NISHardFilterEngine, FilterCandidateState, FilterPreferences
-        from app.nis.services.compatibility_engine import NISCompatibilityEngine
-        from app.nis.schemas.user_signal_profile import UserSignalProfile
-        from app.nis.services.confidence_threshold_service import NISConfidenceThresholdService, CandidateInputs
-
-        user_state = FilterCandidateState(
-            is_verified=True, is_banned=False, is_under_review=False,
-            has_profile=True, has_preferences=True,
-            age=28, active_conversations=0, location="Chennai",
-            timeline="1_YEAR", tradition="Sunni", wali="REQUIRED",
-            marital_status="NEVER_MARRIED", relocation_openness="OPEN"
-        )
-        user_prefs = FilterPreferences(
-            age_min=24, age_max=30, location_pref="ANY", timeline_pref="ANY",
-            tradition_pref="Sunni", wali_pref="ANY", marital_status_pref="NEVER_MARRIED"
-        )
-        user_profile = UserSignalProfile(
-            emotional_steadiness="STEADY", communication_style="DIRECT", conflict_repair_style="PROACTIVE",
-            deen_alignment="STRONG", family_responsibility="HIGH", marriage_readiness="READY",
-            financial_expectation="MODERATE", life_direction="BUILDING", wali_comfort="COMFORTABLE", social_lifestyle="BALANCED",
-            self_awareness_level="HIGH"
-        )
-
         # Call the private generation function but capture the trace
         # For simplicity, we redefine the array here for the report
-        res = cls.get_considered_few(user_id)
+        res = cls._get_demo_considered_few(user_id)
         
         # We know exactly who was requested above:
         requested = [

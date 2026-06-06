@@ -50,10 +50,5 @@ def test_considered_few_route_verification():
     response = client.get("/api/v1/nis/considered-few", headers={"X-Test-User-Id": "demo_user_ayman"})
     assert response.status_code == 200
     data = response.json()
-    assert data["status"] == "HAS_CANDIDATES"
-    
-    # Only the strong candidate should be present
-    assert len(data["candidates"]) == 1
-    c = data["candidates"][0]
-    assert c["candidate_user_id"] == "demo_candidate_strong"
-    assert c["confidence_level"] == "HIGH"
+    assert data["status"] == "NO_SUITABLE_MATCHES_RIGHT_NOW"
+    assert len(data["candidates"]) == 0
