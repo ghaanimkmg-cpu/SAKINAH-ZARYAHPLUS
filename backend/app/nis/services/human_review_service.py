@@ -19,6 +19,7 @@ class NISHumanReviewService:
     def create_review(cls, db: Session, flag_id: str, user_id: str, severity: str) -> str:
         # We don't link to a real KYC yet. We just create a pending review.
         rev = NISHumanReview(
+            user_id=uuid.UUID(user_id),
             status=HumanReviewStatus.PENDING
         )
         db.add(rev)
@@ -86,7 +87,7 @@ class NISHumanReviewService:
         for rev in reviews:
             result.append({
                 "review_id": str(rev.id),
-                "user_id": "unknown", # Needs join with reports/kyc
+                "user_id": str(rev.user_id),
                 "severity": "HIGH",
                 "status": rev.status.name if rev.status else "PENDING",
                 "flag_id": "unknown",
