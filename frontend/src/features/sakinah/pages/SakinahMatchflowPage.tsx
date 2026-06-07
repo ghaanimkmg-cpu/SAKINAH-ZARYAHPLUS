@@ -9,7 +9,7 @@ import {
   SakinahLoadingState 
 } from '../components';
 import { getMatchflow } from '../services/sakinahApi';
-import type { MatchflowResponse } from '../types/sakinah.types';
+import type { MatchflowResponse, MatchflowStep } from '../types/sakinah.types';
 
 export const SakinahMatchflowPage: React.FC = () => {
   const navigate = useNavigate();
