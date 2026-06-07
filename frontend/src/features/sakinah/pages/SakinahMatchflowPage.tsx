@@ -62,7 +62,7 @@ export const SakinahMatchflowPage: React.FC = () => {
       </div>
 
       <div className="sk-fx sk-d2">
-        <MatchflowStepper currentStep={matchflow.current_step} />
+        <MatchflowStepper currentStep={matchflow.current_step as MatchflowStep} />
       </div>
       
       {isConversationOpen && (

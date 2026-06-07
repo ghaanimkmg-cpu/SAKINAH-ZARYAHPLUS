@@ -21,7 +21,7 @@ class NISHumanReview(NISBaseModel):
     __tablename__ = "nis_human_reviews"
     user_id = Column(UUID(as_uuid=True), ForeignKey("nis_users.id"), nullable=False)
     report_id = Column(UUID(as_uuid=True), ForeignKey("nis_reports.id"), nullable=True)
-    kyc_id = Column(UUID(as_uuid=True), ForeignKey("nis_kyc_verifications.id"), nullable=True)
+    kyc_id = Column(UUID(as_uuid=True), nullable=True)
     status = Column(SQLEnum(HumanReviewStatus), default=HumanReviewStatus.PENDING)
     decision = Column(SQLEnum(HumanReviewDecision), nullable=True)
 
