@@ -59,6 +59,8 @@ class NISConsideredFewService:
         from app.nis.models.user import NISUser
         from app.nis.models.profiles import NISUserSignalProfile
         from app.nis.models.preferences import NISMatchPreference
+        from app.nis.models.demographics import NISDemographicProfile
+        from app.nis.services.demographics_service import NISDemographicsService
         import uuid
 
         # Convert user_id
@@ -71,26 +73,26 @@ class NISConsideredFewService:
         current_user = db.query(NISUser).filter_by(id=u_uuid).first()
         current_profile = db.query(NISUserSignalProfile).filter_by(user_id=u_uuid).first()
         current_prefs = db.query(NISMatchPreference).filter_by(user_id=u_uuid).first()
+        current_demo = NISDemographicsService.get_demographics(db, str(u_uuid))
 
-        if not current_user or not current_profile or not current_prefs:
+        if not current_user or not current_profile or not current_prefs or not NISDemographicsService.is_demographics_complete(current_demo):
             return ConsideredFewResponse(
                 status="NO_SUITABLE_MATCHES_RIGHT_NOW",
                 candidates=[],
-                message="Please complete your profile and preferences to see matches."
+                message="Please complete your profile, demographics, and preferences to see matches."
             )
 
         # Build current user state and prefs
-        # Note: mapping DB models to filter engine models (simplified for Phase K)
         def _get_float_str(val):
             if val is None: return "UNKNOWN"
             if val >= 0.8: return "HIGH"
             if val <= 0.3: return "LOW"
-            return "STEADY" # moderate/steady
+            return "STEADY"
 
         from app.nis.schemas.user_signal_profile import UserSignalProfile
         user_prof_schema = UserSignalProfile(
             emotional_steadiness=_get_float_str(current_profile.emotional_steadiness),
-            communication_style="DIRECT", # Using defaults for fields that might be missing in Phase K
+            communication_style="DIRECT", 
             conflict_repair_style="PROACTIVE",
             deen_alignment="STRONG",
             family_responsibility="HIGH",
@@ -108,14 +110,14 @@ class NISConsideredFewService:
             is_under_review=(current_user.eligibility_status == "HUMAN_REVIEW_REQUIRED"),
             has_profile=True,
             has_preferences=True,
-            age=28, # Placeholder
+            age=current_demo.age,
             active_conversations=0,
-            location="Unknown",
-            timeline="1_YEAR",
-            tradition="Sunni",
-            wali="REQUIRED",
-            marital_status="NEVER_MARRIED",
-            relocation_openness="OPEN"
+            location=current_demo.location,
+            timeline=current_demo.nikah_timeline or "1_YEAR",
+            tradition=current_demo.tradition,
+            wali=current_demo.wali_preference or "REQUIRED",
+            marital_status=current_demo.marital_status,
+            relocation_openness=current_demo.relocation_open or "OPEN"
         )
         
         user_filter_prefs = FilterPreferences(
@@ -129,13 +131,16 @@ class NISConsideredFewService:
         )
 
         # 2. Fetch candidates from DB
-        # For Phase K, we just query all other users
         candidates_db = db.query(NISUser).filter(NISUser.id != u_uuid).limit(50).all()
         
         inputs = []
         for c_user in candidates_db:
             c_profile = db.query(NISUserSignalProfile).filter_by(user_id=c_user.id).first()
             c_prefs = db.query(NISMatchPreference).filter_by(user_id=c_user.id).first()
+            c_demo = NISDemographicsService.get_demographics(db, str(c_user.id))
+            
+            if not NISDemographicsService.is_demographics_complete(c_demo):
+                continue # Block candidate if demographics are missing/incomplete
             
             c_state = FilterCandidateState(
                 is_verified=(c_user.eligibility_status == "VERIFIED"),
@@ -143,14 +148,14 @@ class NISConsideredFewService:
                 is_under_review=(c_user.eligibility_status == "HUMAN_REVIEW_REQUIRED"),
                 has_profile=(c_profile is not None),
                 has_preferences=(c_prefs is not None),
-                age=25, # Placeholder
+                age=c_demo.age,
                 active_conversations=0,
-                location="Unknown",
-                timeline="1_YEAR",
-                tradition="Sunni",
-                wali="REQUIRED",
-                marital_status="NEVER_MARRIED",
-                relocation_openness="OPEN"
+                location=c_demo.location,
+                timeline=c_demo.nikah_timeline or "1_YEAR",
+                tradition=c_demo.tradition,
+                wali=c_demo.wali_preference or "REQUIRED",
+                marital_status=c_demo.marital_status,
+                relocation_openness=c_demo.relocation_open or "OPEN"
             )
             
             if c_prefs:

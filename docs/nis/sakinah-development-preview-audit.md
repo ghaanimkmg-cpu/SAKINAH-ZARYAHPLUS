@@ -85,7 +85,9 @@ The frontend `sakinahApi.ts` injects a hardcoded `X-Test-User-Id: user_frontend_
 To safely transition Sakinah from Development Preview to Full Production, the following phases are recommended in order:
 
 1. **Phase: Persistence Layer**
-   - Design and apply SQLAlchemy models and migrations for NIS matching data.
+   - [x] Phase K.1: Core Persistence Layer (Matchflow, Conversations, Human Reviews)
+   - [x] Phase K.2: Demographics Persistence (NISDemographicProfile implemented, static defaults removed)
+   - [ ] Phase L: External KYC Vendor Integrations for NIS matching data.
    - Replace Python backend mock repositories with real DB CRUD operations.
 2. **Phase: Complete Missing APIs**
    - Build backend endpoints for Niyyah, Values, Mirror, and Portrait.

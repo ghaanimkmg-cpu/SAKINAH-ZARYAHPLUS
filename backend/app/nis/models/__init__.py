@@ -6,3 +6,4 @@ from app.nis.models.profiles import NISUserSignalProfile, NISNiyyahIntention, NI
 from app.nis.models.matching import NISCompatibilityEvaluation, NISConsideredPool, NISMatchInterest, NISMatchflow
 from app.nis.models.conversation import NISStructuredConversation, NISConversationMessage
 from app.nis.models.safety import NISSafetyFlag, NISReport, NISHumanReview, NISIdentityBan, NISAuditLog
+from app.nis.models.demographics import NISDemographicProfile

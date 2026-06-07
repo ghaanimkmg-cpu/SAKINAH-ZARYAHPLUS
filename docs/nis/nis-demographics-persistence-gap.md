@@ -44,5 +44,7 @@ The demographics pipeline must adhere to strict privacy rules:
 - **Never expose selfie biometrics**: Liveness checks are for internal verification only.
 - **Identity data is system-only**: `verified_identity_name` and exact age validation are strictly for internal trust systems and hard filters, not for display on public profiles unless explicitly governed by the product rules.
 
-## How this removes static defaults
-Once this model is created and populated, the `NISConsideredFewService` will query `NISDemographicProfile` alongside `NISUserSignalProfile`. It will instantiate `FilterCandidateState` dynamically using the stored values, completely removing the temporary `age=25` static defaults from the production matching logic.
+## Status Update (Phase K.2)
+The `NISDemographicProfile` model has now been implemented. Static defaults (`age=25`, `location="Unknown"`, etc.) have been completely removed from the `NISConsideredFewService` production logic. The `FilterCandidateState` is now hydrated from real database values.
+
+However, the external KYC vendor integration (Phase L) is still pending. The `verified_identity_name`, `verified_age`, and `verified_gender` fields exist in the database schema but are not yet populated by a real third-party service. Raw Aadhaar and liveness integrations remain pending for Phase L.
