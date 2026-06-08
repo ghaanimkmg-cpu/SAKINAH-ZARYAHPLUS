@@ -186,7 +186,14 @@ KYC and Liveness cannot be fully production-live without real vendor credentials
 - Weak liveness goes to human review.
 - Raw Aadhaar/selfie not stored.
 
-## 13. What Is Fully Working Now
+## 13. Sakinah Journey Navigator
+A reference-style **Sakinah Journey Navigator** was added to the frontend layout.
+- It maps the whole user journey from Arrival to Decision.
+- It includes anchoring principles so developers do not break product rules.
+- It is navigation only and does not change NIS decisions.
+- It provides a premium, desktop-side drawer and a mobile-collapsible drawer for seamless travel between the stages of the app.
+
+## 14. What Is Fully Working Now
 - Frontend full journey
 - Backend APIs
 - Database persistence
@@ -200,7 +207,7 @@ KYC and Liveness cannot be fully production-live without real vendor credentials
 - Production build passes
 - Backend tests pass
 
-## 14. What Is Not Yet Final Production
+## 15. What Is Not Yet Final Production
 - Real KYC/liveness vendor credentials
 - Live vendor SDK/API wiring
 - Firebase Admin token validation if Omar requires Firebase
@@ -208,12 +215,12 @@ KYC and Liveness cannot be fully production-live without real vendor credentials
 - Production users
 - Push notifications if required
 
-## 15. Final Status
+## 16. Final Status
 - **Demo-ready: Yes** (Fully runnable on `localhost` with mocked data/vendor endpoints).
 - **Staging-ready: Yes** (Ready for a live test environment to review frontend UX).
 - **Production-ready: Not yet** (Requires live vendor credentials and actual production integrations).
 
-## 16. What Future Developers Should Do Next
+## 17. What Future Developers Should Do Next
 1. Add real KYC/liveness vendor credentials.
 2. Replace sandbox adapter with real vendor API implementation.
 3. Decide Firebase/Firestore vs current SQLAlchemy/PostgreSQL direction.
@@ -223,7 +230,7 @@ KYC and Liveness cannot be fully production-live without real vendor credentials
 7. Security review.
 8. Then production deployment.
 
-## 17. Rules Developers Must Not Break
+## 18. Rules Developers Must Not Break
 - no swipe
 - no feed
 - no public profiles

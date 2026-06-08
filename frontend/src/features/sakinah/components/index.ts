@@ -35,3 +35,4 @@ export * from './SakinahSupportCard';
 export * from './SakinahNotice';
 export * from './SakinahRayaOrb';
 export * from './SakinahRayaSheet';
+export * from './SakinahJourneyNavigator';
