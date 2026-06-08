@@ -73,15 +73,9 @@ python -m pytest
 uvicorn app.main:app --reload
 ```
 
-## NIS Proof Report
-You can verify the intelligence, safety, and compatibility rules of the NIS engine in real-time by navigating to the development proof dashboard:
-`http://localhost:5173/sakinah/dev/proof-report`
-
-## Production Gaps
-Sakinah is currently structurally complete but operating in a safe sandbox mode. Before going live to production, the following must be resolved:
-1. **Real KYC Vendor:** Replace the `SandboxKycVendorAdapter` with live Onfido/SumSub API keys.
-2. **Firebase Admin Validation:** Swap the generic `PyJWT` auth dependency with live Firebase Admin validation.
-3. **Push Notifications:** Integrate Firebase Cloud Messaging for matchflow alerts.
+## Final Report
+For the final Sakinah + NIS report, open:
+[docs/nis/SAKINAH-FINAL-REPORT.md](docs/nis/SAKINAH-FINAL-REPORT.md)
 
 ## Branch Note
 This work is currently on `feature/sakinah-nis-full-build` and should not be merged to main without review.
