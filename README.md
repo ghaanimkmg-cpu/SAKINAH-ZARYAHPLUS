@@ -48,6 +48,12 @@ NEXUS Intelligence System, NIS, is the backend intelligence system that powers e
 - Backend/NIS is server-authoritative
 
 ## Local Setup
+The easiest way to start both the frontend and backend locally is using the unified start script from the repository root:
+```bash
+.\start-dev.bat
+```
+
+Alternatively, you can run them manually:
 
 ### Frontend
 ```bash
@@ -67,8 +73,18 @@ python -m pytest
 uvicorn app.main:app --reload
 ```
 
+## NIS Proof Report
+You can verify the intelligence, safety, and compatibility rules of the NIS engine in real-time by navigating to the development proof dashboard:
+`http://localhost:5173/sakinah/dev/proof-report`
+
+## Production Gaps
+Sakinah is currently structurally complete but operating in a safe sandbox mode. Before going live to production, the following must be resolved:
+1. **Real KYC Vendor:** Replace the `SandboxKycVendorAdapter` with live Onfido/SumSub API keys.
+2. **Firebase Admin Validation:** Swap the generic `PyJWT` auth dependency with live Firebase Admin validation.
+3. **Push Notifications:** Integrate Firebase Cloud Messaging for matchflow alerts.
+
 ## Branch Note
 This work is currently on `feature/sakinah-nis-full-build` and should not be merged to main without review.
 
 ## Status
-Work in progress / deployment-ready review branch.
+Demo-Ready / Staging-Ready. Pending final production gap resolution.
