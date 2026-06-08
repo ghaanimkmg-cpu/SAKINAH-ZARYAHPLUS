@@ -31,8 +31,8 @@ def test_considered_few_uses_real_demographics(db):
     ub = uuid.uuid4()
     
     db.add_all([
-        NISUser(id=ua, zaryah_user_id="user_a"),
-        NISUser(id=ub, zaryah_user_id="user_b")
+        NISUser(id=ua, zaryah_user_id="user_a", eligibility_status="VERIFIED"),
+        NISUser(id=ub, zaryah_user_id="user_b", eligibility_status="VERIFIED")
     ])
     
     # Both have complete profiles, preferences, demographics
@@ -61,7 +61,7 @@ def test_considered_few_uses_real_demographics(db):
 def test_age_mismatch_blocks_candidate(db):
     ua = uuid.uuid4()
     ub = uuid.uuid4()
-    db.add_all([NISUser(id=ua, zaryah_user_id="a"), NISUser(id=ub, zaryah_user_id="b")])
+    db.add_all([NISUser(id=ua, zaryah_user_id="a", eligibility_status="VERIFIED"), NISUser(id=ub, zaryah_user_id="b", eligibility_status="VERIFIED")])
     db.add_all([
         NISUserSignalProfile(user_id=ua, emotional_steadiness=0.9),
         NISUserSignalProfile(user_id=ub, emotional_steadiness=0.9),
@@ -83,7 +83,7 @@ def test_age_mismatch_blocks_candidate(db):
 
 def test_missing_current_user_demographics_returns_insufficient(db):
     ua = uuid.uuid4()
-    db.add(NISUser(id=ua, zaryah_user_id="a"))
+    db.add(NISUser(id=ua, zaryah_user_id="a", eligibility_status="VERIFIED"))
     db.add(NISUserSignalProfile(user_id=ua, emotional_steadiness=0.9))
     db.add(NISMatchPreference(user_id=ua, age_range_min=20, age_range_max=25))
     # NO DEMOGRAPHICS
@@ -96,7 +96,7 @@ def test_missing_current_user_demographics_returns_insufficient(db):
 def test_missing_candidate_demographics_blocks_candidate(db):
     ua = uuid.uuid4()
     ub = uuid.uuid4()
-    db.add_all([NISUser(id=ua, zaryah_user_id="a"), NISUser(id=ub, zaryah_user_id="b")])
+    db.add_all([NISUser(id=ua, zaryah_user_id="a", eligibility_status="VERIFIED"), NISUser(id=ub, zaryah_user_id="b", eligibility_status="VERIFIED")])
     db.add_all([
         NISUserSignalProfile(user_id=ua, emotional_steadiness=0.9),
         NISUserSignalProfile(user_id=ub, emotional_steadiness=0.9),

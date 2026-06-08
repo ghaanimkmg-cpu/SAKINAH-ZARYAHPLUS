@@ -116,6 +116,54 @@ The API must **never** expose:
   - **Body:** `{"age_min": 26}`
   - **Response:** `{"status": "UPDATED"}`
 
+### Readiness
+- **GET /api/v1/nis/readiness/home**
+  - **Purpose:** Aggregate the completion status of all readiness phases.
+  - **Auth:** Required
+  - **Response:** `{"niyyah_complete": true, "values_complete": true, "mirror_complete": false, "portrait_complete": false, "demographics_complete": true, "is_fully_ready": false}`
+
+### Niyyah
+- **GET /api/v1/nis/niyyah/me**
+  - **Purpose:** Retrieve the user's Niyyah intention.
+  - **Auth:** Required
+  - **Response:** `{"intention_text": "...", "is_complete": true}`
+- **PUT /api/v1/nis/niyyah/me**
+  - **Purpose:** Save the user's Niyyah intention.
+  - **Auth:** Required
+  - **Body:** `{"intention_text": "..."}`
+
+### Values
+- **GET /api/v1/nis/values/me**
+  - **Purpose:** Retrieve the user's Values data.
+  - **Auth:** Required
+  - **Response:** `{"values_data": {...}, "is_complete": true}`
+- **PUT /api/v1/nis/values/me**
+  - **Purpose:** Save the user's Values data.
+  - **Auth:** Required
+  - **Body:** `{"values_data": {...}}`
+
+### Mirror
+- **GET /api/v1/nis/mirror/me**
+  - **Purpose:** Retrieve the user's private Mirror reflections.
+  - **Auth:** Required
+  - **Response:** `{"reflection_data": {...}, "is_complete": true}`
+  - **Privacy:** Must remain private-only. Must not be exposed to candidates.
+- **PUT /api/v1/nis/mirror/me**
+  - **Purpose:** Save the user's private Mirror reflections.
+  - **Auth:** Required
+  - **Body:** `{"reflection_data": {...}}`
+
+### Portrait
+- **GET /api/v1/nis/portrait/me**
+  - **Purpose:** Retrieve the user's derived Portrait data.
+  - **Auth:** Required
+  - **Response:** `{"portrait_data": {...}, "is_complete": true}`
+  - **Privacy:** Must remain user-only. Must not be exposed to matches.
+- **PUT /api/v1/nis/portrait/me**
+  - **Purpose:** Save the user's Portrait data.
+  - **Auth:** Required
+  - **Body:** `{"portrait_data": {...}}`
+
 ### Considered Few
 - **GET /api/v1/nis/considered-few**
   - **Purpose:** Retrieve the curated list of candidates considered highly compatible.

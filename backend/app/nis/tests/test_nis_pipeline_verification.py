@@ -34,8 +34,7 @@ def test_pipeline_privacy_fields_not_exposed():
 from fastapi.testclient import TestClient
 from app.main import app
 
-def test_api_route_considered_few():
-    client = TestClient(app)
+def test_api_route_considered_few(client):
     response = client.get("/api/v1/nis/considered-few", headers={"X-Test-User-Id": "user_frontend_dev"})
     
     assert response.status_code == 200

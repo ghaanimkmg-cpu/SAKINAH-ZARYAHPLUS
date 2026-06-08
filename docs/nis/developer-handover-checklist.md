@@ -46,7 +46,7 @@ The frontend implements the full premium dark-gold parity reference flow. The co
 ## 4. Production Pending (Next Steps)
 The following features are stubbed or mocked in the current parity build and must be wired up securely before a production launch:
 - [ ] **Production JWT / User Mapping:** Connect the real user identity system to NIS. Currently, endpoints use hardcoded 'mock_target' or similar IDs.
-- [ ] **PostgreSQL Live DB Wiring:** Transition the SQLite/in-memory stubs or missing columns to the live production schema on PostgreSQL.
+- [x] **PostgreSQL Live DB Wiring:** Matchflow, Demographics, and Readiness profiles (Niyyah, Values, Mirror, Portrait) are now persisted via SQLAlchemy.
 - [ ] **Real KYC / Liveness Vendor:** Integrate the actual third-party vendor (e.g., Onfido, SumSub) for KYC and liveness checks to replace the visual placeholder screens.
 - [ ] **Admin Role Enforcement:** Ensure that NIS backend routes fully enforce admin-only constraints where required via JWT scopes.
 

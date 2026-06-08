@@ -106,7 +106,7 @@ def test_full_nis_persistence_layer(db):
 
     # Human Review
     # We need an NISReport first to link NISHumanReview, but report_id is nullable
-    review = NISHumanReview(status=HumanReviewStatus.COMPLETED, decision=HumanReviewDecision.APPROVED)
+    review = NISHumanReview(user_id=user_a_id, status=HumanReviewStatus.COMPLETED, decision=HumanReviewDecision.APPROVED)
     db.add(review)
     db.commit()
     assert db.query(NISHumanReview).first().decision == HumanReviewDecision.APPROVED

@@ -50,16 +50,21 @@ class NISHumanReviewService:
         except KeyError:
             decision_enum = HumanReviewDecision.NO_ACTION
 
-        rev.status = HumanReviewStatus.RESOLVED
+        rev.status = HumanReviewStatus.COMPLETED
         rev.decision = decision_enum
+        rev.reviewer_notes = request.notes
         db.commit()
 
         # Assuming user_id could be tracked, but schema doesn't link user directly in HumanReview
         # It links via KYC or Report.
-        # If ban, we add to IdentityBan
+        # If ban, we add to IdentityBan and update user
         if request.decision == "PERMANENT_BAN":
             ban = NISIdentityBan(identity_hash=str(uuid.uuid4().hex), reason=request.notes or "Banned via review")
             db.add(ban)
+            from app.nis.models.user import NISUser
+            u = db.query(NISUser).filter_by(id=rev.user_id).first()
+            if u:
+                u.eligibility_status = "BANNED"
             db.commit()
             
         return ReviewDecisionResponse(
@@ -71,14 +76,16 @@ class NISHumanReviewService:
         
     @classmethod
     def get_user_status(cls, db: Session, user_id: str) -> str:
-        # In a real system, we check the NISUser table's status column.
-        # For this Phase K, we assume VERIFIED unless banned.
+        from app.nis.models.user import NISUser
+        u = db.query(NISUser).filter_by(id=uuid.UUID(user_id)).first()
+        if u:
+            return u.eligibility_status.name if hasattr(u.eligibility_status, 'name') else str(u.eligibility_status)
         return "VERIFIED"
 
     @classmethod
     def check_matchmaking_eligibility(cls, db: Session, user_id: str) -> bool:
         status = cls.get_user_status(db, user_id)
-        return status not in ["BANNED", "UNDER_REVIEW", "PAUSED"]
+        return status not in ["BANNED", "UNDER_REVIEW", "PAUSED", "NOT_STARTED"]
 
     @classmethod
     def list_reviews(cls, db: Session) -> List[dict]:

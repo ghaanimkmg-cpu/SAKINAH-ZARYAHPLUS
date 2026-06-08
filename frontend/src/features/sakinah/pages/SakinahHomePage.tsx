@@ -1,22 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getReadinessHome } from '../services/sakinahApi';
 import { 
   SakinahJourneyFrame, 
   SakinahJourneyStepper,
   SakinahMetaRow,
   SakinahButton,
-  SakinahSupportCard,
-  DevFallbackBadge
+  SakinahSupportCard
 } from '../components';
 
 export const SakinahHomePage: React.FC = () => {
   const navigate = useNavigate();
+  const [readiness, setReadiness] = useState<any>(null);
+
+  useEffect(() => {
+    getReadinessHome().then(setReadiness).catch(console.error);
+  }, []);
 
   return (
     <SakinahJourneyFrame>
-      <div className="pt-2 mb-2">
-        <DevFallbackBadge message="Development Preview Mode: No backend aggregation connected yet." />
-      </div>
 
       <div className="flex items-center gap-[6px] mb-[24px] sk-fx sk-d1">
         <div className="font-serif text-[18px] text-[var(--sk-gold)]">۞</div>

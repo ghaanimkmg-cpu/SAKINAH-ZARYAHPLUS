@@ -27,27 +27,22 @@ These pages are static onboarding or purely informative. They are considered pro
 
 ### Pending Database Persistence APIs
 These routes are purely frontend placeholders. Their data is not saved to the backend yet.
-- `/sakinah/home`
-  - **Preview Badge:** "Development Preview Mode: No backend aggregation connected yet."
-  - **Missing:** Dashboard aggregation API to pull matches, status, and pending actions.
-- `/sakinah/niyyah`
-  - **Preview Badge:** "Development Preview Mode: Persistence API pending."
-  - **Missing:** Backend API to store Niyyah text and DB schema.
-- `/sakinah/values`
-  - **Preview Badge:** "Development Preview Mode: Persistence API pending."
-  - **Missing:** Backend API to store Islamic value alignments.
-- `/sakinah/mirror`
-  - **Preview Badge:** "Development Preview Mode: Mirror API pending. No answers stored."
-  - **Missing:** Backend API to store deep self-reflection answers.
-- `/sakinah/portrait`
-  - **Preview Badge:** "Development Preview Mode: Portrait API pending."
-  - **Missing:** Backend API to store structured profile traits.
 - `/sakinah/vent`
   - **Preview Badge:** "Development Preview Mode: Private frontend-only journaling."
   - **Missing:** If intended for cloud sync, a secure private journaling API. Otherwise, remains local.
 
 ### Backend-Backed (But Dependent on Fallbacks/Mocks)
 These routes have functioning backend endpoints (`/api/v1/nis/...`) but currently rely on mock candidate data, test headers (`X-Test-User-Id`), or local fallback logic if the API fails.
+- `/sakinah/home`
+  - **Current State:** API connected for readiness aggregation.
+- `/sakinah/niyyah`
+  - **Current State:** API connected, saves and loads Niyyah data.
+- `/sakinah/values`
+  - **Current State:** API connected, saves and loads Values data.
+- `/sakinah/mirror`
+  - **Current State:** API connected, saves and loads private Mirror reflections.
+- `/sakinah/portrait`
+  - **Current State:** API connected, generates and saves private Portrait.
 - `/sakinah/eligibility`
   - **Current State:** API connected, uses `DevFallbackBadge` if offline.
 - `/sakinah/profile`

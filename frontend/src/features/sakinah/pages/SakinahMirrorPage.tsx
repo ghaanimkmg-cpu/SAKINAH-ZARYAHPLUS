@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getMirror, updateMirror } from '../services/sakinahApi';
 import { 
   SakinahJourneyFrame, 
-  SakinahReflectionCard,
-  DevFallbackBadge
+  SakinahReflectionCard
 } from '../components';
 
 const DIMENSIONS = [
@@ -21,12 +21,35 @@ const DIMENSIONS = [
 export const SakinahMirrorPage: React.FC = () => {
   const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
 
-  const handleNext = () => {
+  useEffect(() => {
+    getMirror().then(res => {
+      if (res.reflection_data) {
+        setAnswers(res.reflection_data);
+        // Start from where they left off, or 0 if complete/new
+        const answeredCount = Object.keys(res.reflection_data).length;
+        if (answeredCount > 0 && answeredCount < DIMENSIONS.length) {
+          setCurrentIndex(answeredCount);
+        }
+      }
+    }).catch(console.error);
+  }, []);
+
+  const handleNext = async (answerId?: string) => {
+    const dim = DIMENSIONS[currentIndex];
+    const newAnswers = { ...answers, [dim.id]: answerId || 'skip' };
+    setAnswers(newAnswers);
+
     if (currentIndex < DIMENSIONS.length - 1) {
       setCurrentIndex(prev => prev + 1);
     } else {
-      navigate('/sakinah/portrait');
+      try {
+        await updateMirror({ reflection_data: newAnswers });
+        navigate('/sakinah/portrait');
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
@@ -43,10 +66,6 @@ export const SakinahMirrorPage: React.FC = () => {
           <div className="font-serif text-[24px] text-[var(--sk-gold)] leading-[1.1]">The Mirror</div>
           <div className="text-[12px] text-[var(--sk-ink-faint)] tracking-[0.02em] mt-1">Phase 3 · character through gratitude</div>
         </div>
-      </div>
-
-      <div className="mb-4">
-        <DevFallbackBadge message="Development Preview Mode: Mirror API pending. No answers stored." />
       </div>
 
       <div className="flex gap-[4px] mb-[22px]">
@@ -69,7 +88,7 @@ export const SakinahMirrorPage: React.FC = () => {
           { id: 'B', label: 'If you', text: dim.optB }
         ]}
         onSelect={handleNext}
-        onSkip={handleNext}
+        onSkip={() => handleNext('skip')}
       />
 
       <div className="bg-[rgba(212,168,83,0.05)] border border-[rgba(212,168,83,0.2)] rounded-[13px] p-[14px] text-[12px] text-[var(--sk-ink-dim)] leading-[1.5] mt-4 font-light">

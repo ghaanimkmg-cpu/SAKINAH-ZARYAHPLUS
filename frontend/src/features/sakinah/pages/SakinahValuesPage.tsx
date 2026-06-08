@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getValues, updateValues } from '../services/sakinahApi';
 import { 
   SakinahJourneyFrame, 
   SakinahHeader, 
   SakinahButton,
   SakinahChoiceChip,
-  SakinahSpectrumChoice,
-  DevFallbackBadge
+  SakinahSpectrumChoice
 } from '../components';
 
 export const SakinahValuesPage: React.FC = () => {
@@ -15,6 +15,30 @@ export const SakinahValuesPage: React.FC = () => {
   const [tradition, setTradition] = useState<string>('sunni_hanafi');
   const [flexibility, setFlexibility] = useState<string>('must_share');
   const [stage, setStage] = useState<string>('never_married');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    getValues().then(res => {
+      if (res.values_data && Object.keys(res.values_data).length > 0) {
+        setValue(res.values_data.value || 'steadiness');
+        setTradition(res.values_data.tradition || 'sunni_hanafi');
+        setFlexibility(res.values_data.flexibility || 'must_share');
+        setStage(res.values_data.stage || 'never_married');
+      }
+    }).catch(console.error);
+  }, []);
+
+  const handleContinue = async () => {
+    setLoading(true);
+    try {
+      await updateValues({ values_data: { value, tradition, flexibility, stage } });
+      navigate('/sakinah/mirror');
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SakinahJourneyFrame>
@@ -24,11 +48,7 @@ export const SakinahValuesPage: React.FC = () => {
         onBack={() => navigate('/sakinah/niyyah')} 
       />
 
-      <div className="mb-4">
-        <DevFallbackBadge message="Development Preview Mode: Persistence API pending." />
-      </div>
-
-      <p className="text-[13px] text-[var(--sk-ink-dim)] font-light leading-[1.6] mb-[14px] text-center sk-fx sk-d1">
+      <p className="text-[13px] text-[var(--sk-ink-dim)] font-light leading-[1.6] mb-[14px] text-center sk-fx sk-d1 mt-4">
         We ask first what <em className="italic text-[var(--sk-gold-soft)]">you</em> bring — and who you are — so we find someone who shares your understanding of the deen.
       </p>
 
@@ -120,8 +140,8 @@ export const SakinahValuesPage: React.FC = () => {
       </div>
 
       <div className="sk-fx sk-d6 mt-4">
-        <SakinahButton variant="primary" onClick={() => navigate('/sakinah/mirror')}>
-          Continue to the Mirror →
+        <SakinahButton variant="primary" onClick={handleContinue} disabled={loading}>
+          {loading ? 'Saving...' : 'Continue to the Mirror →'}
         </SakinahButton>
       </div>
     </SakinahJourneyFrame>

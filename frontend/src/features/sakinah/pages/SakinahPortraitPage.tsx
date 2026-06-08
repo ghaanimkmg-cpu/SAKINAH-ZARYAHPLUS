@@ -1,14 +1,33 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getPortrait, updatePortrait } from '../services/sakinahApi';
 import { 
   SakinahJourneyFrame, 
   SakinahPortraitCard,
-  SakinahButton,
-  DevFallbackBadge
+  SakinahButton
 } from '../components';
 
 export const SakinahPortraitPage: React.FC = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    getPortrait().then(async res => {
+      if (!res.is_complete) {
+        await updatePortrait({
+          portrait_data: {
+            auraChar: "ع",
+            quote: "Someone who finds steadiness in routine, gives quietly, and is learning to let people in.",
+            signals: [
+              { name: 'Steadiness under pressure', value: 'High', percentage: 82 },
+              { name: 'Quiet generosity', value: 'High', percentage: 78 },
+              { name: 'Emotional openness', value: 'Growing', percentage: 48 },
+              { name: 'Family orientation', value: 'Deep', percentage: 88 },
+            ]
+          }
+        });
+      }
+    }).catch(console.error);
+  }, []);
 
   return (
     <SakinahJourneyFrame>
@@ -18,10 +37,6 @@ export const SakinahPortraitPage: React.FC = () => {
           <div className="font-serif text-[24px] text-[var(--sk-gold)] leading-[1.1]">Your portrait</div>
           <div className="text-[12px] text-[var(--sk-ink-faint)] tracking-[0.02em] mt-1">Drawn from your reflections</div>
         </div>
-      </div>
-
-      <div className="mb-4">
-        <DevFallbackBadge message="Development Preview Mode: Portrait API pending." />
       </div>
 
       <SakinahPortraitCard

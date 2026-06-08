@@ -3,10 +3,9 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.core.config import settings
 
-def test_proof_endpoint_works_in_development():
+def test_proof_endpoint_works_in_development(client):
     # Force development mode for the test
     settings.APP_ENV = "development"
-    client = TestClient(app)
     response = client.get("/api/v1/nis/dev/proof-report")
     assert response.status_code == 200
     data = response.json()
@@ -24,9 +23,8 @@ def test_proof_endpoint_works_in_development():
             assert r["expected"] == "BLOCKED"
             assert r["actual"] == "BLOCKED"
 
-def test_proof_endpoint_blocked_in_production():
+def test_proof_endpoint_blocked_in_production(client):
     settings.APP_ENV = "production"
-    client = TestClient(app)
     response = client.get("/api/v1/nis/dev/proof-report")
     assert response.status_code == 403
     assert "Forbidden" in response.json()["detail"]
@@ -34,8 +32,7 @@ def test_proof_endpoint_blocked_in_production():
     # Restore dev mode for other tests
     settings.APP_ENV = "development"
 
-def test_no_private_fields_exposed():
-    client = TestClient(app)
+def test_no_private_fields_exposed(client):
     response = client.get("/api/v1/nis/dev/proof-report")
     data_str = response.text.lower()
     assert "percentage" not in data_str
@@ -45,8 +42,7 @@ def test_no_private_fields_exposed():
     assert "firebase" not in data_str
     assert "raw_raya" not in data_str
 
-def test_considered_few_route_verification():
-    client = TestClient(app)
+def test_considered_few_route_verification(client):
     response = client.get("/api/v1/nis/considered-few", headers={"X-Test-User-Id": "demo_user_ayman"})
     assert response.status_code == 200
     data = response.json()

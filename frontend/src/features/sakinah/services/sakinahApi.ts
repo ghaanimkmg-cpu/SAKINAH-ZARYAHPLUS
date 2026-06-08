@@ -118,6 +118,55 @@ export async function submitReport(reportedUserId: string, flagType: string, sev
   });
 }
 
+// Readiness
+export async function getReadinessHome() {
+  return fetchNisApi('/readiness/home');
+}
+
+export async function getNiyyah() {
+  return fetchNisApi('/niyyah/me');
+}
+
+export async function updateNiyyah(data: { intention_text: string }) {
+  return fetchNisApi('/niyyah/me', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
+export async function getValues() {
+  return fetchNisApi('/values/me');
+}
+
+export async function updateValues(data: { values_data: any }) {
+  return fetchNisApi('/values/me', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
+export async function getMirror() {
+  return fetchNisApi('/mirror/me');
+}
+
+export async function updateMirror(data: { reflection_data: any }) {
+  return fetchNisApi('/mirror/me', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
+export async function getPortrait() {
+  return fetchNisApi('/portrait/me');
+}
+
+export async function updatePortrait(data: { portrait_data: any }) {
+  return fetchNisApi('/portrait/me', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+
 // Development Proof
 export async function getNisProofReport() {
   return fetchNisApi('/dev/proof-report');

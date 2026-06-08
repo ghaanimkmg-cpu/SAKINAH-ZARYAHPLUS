@@ -26,16 +26,21 @@ def override_get_db():
     finally:
         db.close()
 
-@pytest.fixture(scope="session", autouse=True)
-def setup_test_db():
-    # Setup test DB tables
+@pytest.fixture(scope="function")
+def db():
+    # Setup test DB tables for each test to ensure isolation
     NISBaseModel.metadata.create_all(bind=engine)
-    
-    # Override get_db in the main FastAPI app
-    app.dependency_overrides[get_db] = override_get_db
-    
-    yield
-    
-    # Teardown test DB
+    db_session = TestingSessionLocal()
+    yield db_session
+    db_session.close()
     NISBaseModel.metadata.drop_all(bind=engine)
+
+@pytest.fixture(scope="function")
+def client(db):
+    # Override get_db in the main FastAPI app with the test session
+    def override_get_db_for_test():
+        yield db
+
+    app.dependency_overrides[get_db] = override_get_db_for_test
+    yield TestClient(app)
     app.dependency_overrides.clear()

@@ -1,17 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getNiyyah, updateNiyyah } from '../services/sakinahApi';
 import { 
   SakinahJourneyFrame, 
   SakinahHeader, 
   SakinahButton,
-  SakinahChoiceChip,
-  DevFallbackBadge
+  SakinahChoiceChip
 } from '../components';
 
 export const SakinahNiyyahPage: React.FC = () => {
   const navigate = useNavigate();
   const [whyNow, setWhyNow] = useState<string>('ready');
   const [season, setSeason] = useState<string>('building');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    getNiyyah().then(res => {
+      if (res.intention_text) {
+        try {
+          const data = JSON.parse(res.intention_text);
+          setWhyNow(data.whyNow || 'ready');
+          setSeason(data.season || 'building');
+        } catch {}
+      }
+    }).catch(console.error);
+  }, []);
+
+  const handleContinue = async () => {
+    setLoading(true);
+    try {
+      await updateNiyyah({ intention_text: JSON.stringify({ whyNow, season }) });
+      navigate('/sakinah/values');
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SakinahJourneyFrame>
@@ -21,11 +46,7 @@ export const SakinahNiyyahPage: React.FC = () => {
         onBack={() => navigate('/sakinah/home')} 
       />
 
-      <div className="mb-4">
-        <DevFallbackBadge message="Development Preview Mode: Persistence API pending." />
-      </div>
-
-      <p className="text-[13px] text-[var(--sk-ink-dim)] font-light leading-[1.6] mb-[14px] text-center sk-fx sk-d1">
+      <p className="text-[13px] text-[var(--sk-ink-dim)] font-light leading-[1.6] mb-[14px] text-center sk-fx sk-d1 mt-4">
         Before anyone else, we speak of you. No wrong answers — and Raya is right there if you're unsure.
       </p>
 
@@ -72,8 +93,8 @@ export const SakinahNiyyahPage: React.FC = () => {
       </div>
 
       <div className="sk-fx sk-d4 mt-4">
-        <SakinahButton variant="primary" onClick={() => navigate('/sakinah/values')}>
-          Continue →
+        <SakinahButton variant="primary" onClick={handleContinue} disabled={loading}>
+          {loading ? 'Saving...' : 'Continue →'}
         </SakinahButton>
       </div>
     </SakinahJourneyFrame>
