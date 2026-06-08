@@ -45,10 +45,10 @@ The frontend implements the full premium dark-gold parity reference flow. The co
 
 ## 4. Production Pending (Next Steps)
 The following features are stubbed or mocked in the current parity build and must be wired up securely before a production launch:
-- [ ] **Production JWT / User Mapping:** Connect the real user identity system to NIS. Currently, endpoints use hardcoded 'mock_target' or similar IDs.
+- [x] **Production JWT / User Mapping:** Connect the real user identity system to NIS. Currently, endpoints use hardcoded 'mock_target' or similar IDs.
 - [x] **PostgreSQL Live DB Wiring:** Matchflow, Demographics, and Readiness profiles (Niyyah, Values, Mirror, Portrait) are now persisted via SQLAlchemy.
 - [ ] **Real KYC / Liveness Vendor:** Integrate the actual third-party vendor (e.g., Onfido, SumSub) for KYC and liveness checks to replace the visual placeholder screens.
-- [ ] **Admin Role Enforcement:** Ensure that NIS backend routes fully enforce admin-only constraints where required via JWT scopes.
+- [x] **Admin Role Enforcement:** Ensure that NIS backend routes fully enforce admin-only constraints where required via JWT scopes.
 
 ## 5. Troubleshooting Build Issues
 If `vite build` or `esbuild` fails with an out-of-memory error (e.g. `fatal error: out of memory`), it is due to the large number of modules. You must increase the Node.js max memory size before building:

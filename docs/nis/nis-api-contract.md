@@ -79,7 +79,7 @@ The API must **never** expose:
 ### Auth / User Context
 - **GET /api/v1/nis/auth/me**
   - **Purpose:** Retrieve the current authenticated user context.
-  - **Auth:** Required
+  - **Auth:** Required. In development (`APP_ENV=development`), `X-Test-User-Id` header is supported. In production, a valid `Authorization: Bearer <token>` JWT is explicitly required. Future developers integrating Firebase can replace the JWT decoding logic with Firebase Admin verification.
   - **Response:** `{"user_id": "user_123", "roles": ["USER"]}`
 
 ### KYC / Eligibility
@@ -220,11 +220,11 @@ The API must **never** expose:
 ### Admin / Human Review
 - **GET /api/v1/nis/admin/reviews**
   - **Purpose:** List reviews pending admin decision.
-  - **Auth:** Required (Admin level pending)
+  - **Auth:** Required (Admin role enforced via token)
   - **Response:** `[{"review_id": "rev_1", "user_id": "user_bad"}]`
 - **POST /api/v1/nis/admin/reviews/{review_id}/decision**
   - **Purpose:** Submit a moderation decision.
-  - **Auth:** Required (Admin level pending)
+  - **Auth:** Required (Admin role enforced via token)
   - **Body:** `{"decision": "PERMANENT_BAN"}`
   - **Response:** `{"status": "RESOLVED", "decision": "PERMANENT_BAN"}`
 

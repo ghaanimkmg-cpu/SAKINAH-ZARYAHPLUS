@@ -71,9 +71,9 @@ These routes have functioning backend endpoints (`/api/v1/nis/...`) but currentl
 The entire NIS backend engine is currently operating using in-memory `mock_repositories`. No user profiles, preferences, candidate pools, or matchflows are saved to a PostgreSQL database.
 - **Action:** Convert all mock repositories in the backend to SQLAlchemy repositories linked to the real `users`, `user_preferences`, and `matchflows` tables.
 
-### B. JWT Authentication & Security
-The frontend `sakinahApi.ts` injects a hardcoded `X-Test-User-Id: user_frontend_dev` header to bypass authentication.
-- **Action:** Remove the test header injection and enforce standard JWT Bearer token authentication for all Sakinah API routes.
+### B. JWT Authentication & Security (RESOLVED)
+The frontend `sakinahApi.ts` now securely uses Bearer tokens in production and `X-Test-User-Id` is strictly blocked by the backend when `APP_ENV=production`.
+- **Action:** Future developers can replace the PyJWT verification logic with Firebase Admin verification if required.
 
 ## 3. Recommended Next Build Phases
 

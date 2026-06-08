@@ -15,12 +15,24 @@ const API_BASE = '/api/v1/nis';
  * as Sakinah NIS explicitly prohibits Firebase dependencies.
  */
 async function fetchNisApi(endpoint: string, options: RequestInit = {}) {
-  // Use development placeholder auth as specified in Phase 21 docs
-  const headers = {
+  const isDev = import.meta.env.DEV;
+  
+  // Future Firebase integrators: retrieve Firebase ID token here
+  // For now, we expect a generic token in localStorage or nowhere if not logged in
+  const token = localStorage.getItem('sakinah_token');
+
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'X-Test-User-Id': 'user_frontend_dev', // Development placeholder auth
-    ...options.headers,
+    ...(options.headers as Record<string, string>),
   };
+
+  if (isDev) {
+    headers['X-Test-User-Id'] = 'user_frontend_dev';
+  }
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
   const response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
