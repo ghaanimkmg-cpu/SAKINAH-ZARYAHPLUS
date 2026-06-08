@@ -117,10 +117,32 @@ The API must **never** expose:
   - **Response:** `{"status": "UPDATED"}`
 
 ### Readiness
+### 3. KYC and Liveness endpoints
+Wired to `SandboxKycVendorAdapter` for development and pending real vendor API keys for production.
+
+### POST /api/v1/nis/kyc/start
+Initiates the KYC vendor flow.
+
+### GET /api/v1/nis/kyc/status
+Retrieves current KYC status from vendor.
+
+### POST /api/v1/nis/kyc/sandbox/complete
+**(Development Only)**
+Simulates successful completion of KYC. Production calls to this will fail.
+
+### POST /api/v1/nis/liveness/start
+Initiates the Liveness vendor flow.
+
+### GET /api/v1/nis/liveness/status
+Retrieves current Liveness status from vendor.
+
+### POST /api/v1/nis/liveness/sandbox/complete
+**(Development Only)**
+Simulates successful completion of Liveness check. Production calls to this will fail.
+
+### Readiness
 - **GET /api/v1/nis/readiness/home**
   - **Purpose:** Aggregate the completion status of all readiness phases.
-  - **Auth:** Required
-  - **Response:** `{"niyyah_complete": true, "values_complete": true, "mirror_complete": false, "portrait_complete": false, "demographics_complete": true, "is_fully_ready": false}`
 
 ### Niyyah
 - **GET /api/v1/nis/niyyah/me**

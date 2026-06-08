@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   SakinahJourneyFrame, 
@@ -6,14 +6,41 @@ import {
   SakinahButton,
   DevFallbackBadge
 } from '../components';
+import { startLivenessFlow, submitLivenessSandbox } from '../services/sakinahApi';
 
 export const SakinahLivenessPage: React.FC = () => {
   const navigate = useNavigate();
   const [isVerified, setIsVerified] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [vendorStatus, setVendorStatus] = useState<string>('PENDING');
 
-  const handleVerify = () => {
-    // In dev mode, we just simulate success.
-    setIsVerified(true);
+  useEffect(() => {
+    startLivenessFlow().then(res => {
+      setVendorStatus(res.status);
+    }).catch(err => {
+      console.error(err);
+      setVendorStatus('ERROR');
+    });
+  }, []);
+
+  const handleVerify = async () => {
+    if (vendorStatus === 'VENDOR_NOT_CONFIGURED') {
+      alert("Vendor is not configured for production yet.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await submitLivenessSandbox({
+        liveness_status: "STRONG",
+        face_match_status: "STRONG"
+      });
+      setIsVerified(true);
+    } catch (e: any) {
+      alert(e.message || "Liveness Sandbox failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -25,7 +52,11 @@ export const SakinahLivenessPage: React.FC = () => {
       />
 
       <div className="mb-4">
-        <DevFallbackBadge message="Production Liveness vendor pending. No real selfie collected." />
+        {vendorStatus === 'VENDOR_NOT_CONFIGURED' ? (
+          <DevFallbackBadge message="Production vendor pending. Verification disabled." />
+        ) : (
+          <DevFallbackBadge message="Production Liveness vendor pending. No real selfie collected." />
+        )}
       </div>
 
       <div className="sk-portrait sk-fx sk-d1">
@@ -40,8 +71,8 @@ export const SakinahLivenessPage: React.FC = () => {
 
       {!isVerified ? (
         <div className="sk-fx sk-d3 mt-4">
-          <SakinahButton variant="primary" onClick={handleVerify}>
-            Capture & verify
+          <SakinahButton variant="primary" onClick={handleVerify} disabled={loading || vendorStatus === 'VENDOR_NOT_CONFIGURED'}>
+            {loading ? 'Verifying...' : 'Capture & verify'}
           </SakinahButton>
         </div>
       ) : (

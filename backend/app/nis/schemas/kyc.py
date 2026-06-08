@@ -4,7 +4,7 @@ from app.nis.enums.nis_enums import VerificationStatus, EligibilityStatus, Gende
 
 class KYCStartResponse(BaseModel):
     status: str
-    provider: str
+    session_id: Optional[str] = None
     message: str
 
 class KYCCallbackPayload(BaseModel):
@@ -18,13 +18,33 @@ class KYCCallbackPayload(BaseModel):
     verification_passed: bool
 
 class KYCStatusResponse(BaseModel):
-    verification_status: VerificationStatus
-    human_review_required: bool
-    review_reason: Optional[str] = None
-    message: str
+    status: str
+    verification_level: Optional[str] = None
+    human_review_required: bool = False
+    failure_reason: Optional[str] = None
 
 class EligibilityResponse(BaseModel):
     eligibility_status: EligibilityStatus
     can_enter_matching: bool
     requires_human_review: bool
     message: str
+
+class KycSandboxPayload(BaseModel):
+    verified_name: str
+    verified_age: int
+    verified_gender: str
+
+class LivenessSandboxPayload(BaseModel):
+    liveness_status: str
+    face_match_status: str
+
+class LivenessStartResponse(BaseModel):
+    status: str
+    session_id: Optional[str] = None
+    message: str
+
+class LivenessStatusResponse(BaseModel):
+    status: str
+    liveness_status: Optional[str] = None
+    face_match_status: Optional[str] = None
+    human_review_required: bool = False

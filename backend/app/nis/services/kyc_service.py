@@ -1,46 +1,62 @@
-from app.nis.schemas.kyc import KYCStartResponse, KYCCallbackPayload, KYCStatusResponse
-from app.nis.enums.nis_enums import VerificationStatus
+from app.nis.schemas.kyc import KYCStartResponse, KYCStatusResponse, KycSandboxPayload, LivenessStartResponse, LivenessStatusResponse, LivenessSandboxPayload
+from app.nis.services.kyc_vendor_adapter import SandboxKycVendorAdapter
 
 class NISKYCService:
     @staticmethod
     async def start_kyc_flow(user_id: str) -> KYCStartResponse:
-        """
-        Starts the KYC sandbox flow. No real PII in development.
-        """
+        res = SandboxKycVendorAdapter.start_kyc_session(user_id)
         return KYCStartResponse(
-            status="PENDING",
-            provider="sandbox",
-            message="KYC sandbox flow started."
+            status=res["status"],
+            session_id=res.get("session_id"),
+            message=res.get("message", "")
         )
 
     @staticmethod
-    async def process_callback(payload: KYCCallbackPayload, user_id: str) -> KYCStatusResponse:
-        """
-        Processes sandbox payload.
-        Low liveness/face-match score (< 0.8) must create human review requirement, not hard reject.
-        """
-        human_review = False
-        review_reason = None
-        status = VerificationStatus.VERIFIED
-
-        if not payload.verification_passed:
-            status = VerificationStatus.REJECTED
-        elif payload.liveness_score < 0.8 or payload.face_match_score < 0.8:
-            status = VerificationStatus.HUMAN_REVIEW_REQUIRED
-            human_review = True
-            reasons = []
-            if payload.liveness_score < 0.8:
-                reasons.append("Low liveness score")
-            if payload.face_match_score < 0.8:
-                reasons.append("Low face match score")
-            review_reason = " | ".join(reasons)
-
-        # In a real implementation with DB session, we would create/update NISKycVerification and NISUser here.
-        # Minimal verification data is stored. No raw Aadhaar or selfie image is handled.
-
+    async def get_kyc_status(user_id: str) -> KYCStatusResponse:
+        res = SandboxKycVendorAdapter.get_verification_status(user_id)
         return KYCStatusResponse(
-            verification_status=status,
-            human_review_required=human_review,
-            review_reason=review_reason,
-            message="KYC callback processed successfully."
+            status=res["status"],
+            verification_level=res.get("verification_level"),
+            human_review_required=res.get("human_review_required", False),
+            failure_reason=res.get("failure_reason")
+        )
+
+    @staticmethod
+    async def process_kyc_sandbox(payload: KycSandboxPayload, user_id: str) -> KYCStatusResponse:
+        res = SandboxKycVendorAdapter.submit_government_id_sandbox(user_id, payload)
+        # Here we would update NISDemographicProfile
+        # e.g. verified_identity_name = payload.verified_name
+        return KYCStatusResponse(
+            status=res["status"],
+            verification_level="FULL",
+            human_review_required=False
+        )
+
+    @staticmethod
+    async def start_liveness_flow(user_id: str) -> LivenessStartResponse:
+        res = SandboxKycVendorAdapter.start_liveness_session(user_id)
+        return LivenessStartResponse(
+            status=res["status"],
+            session_id=res.get("session_id"),
+            message=res.get("message", "")
+        )
+
+    @staticmethod
+    async def get_liveness_status(user_id: str) -> LivenessStatusResponse:
+        res = SandboxKycVendorAdapter.get_verification_status(user_id)
+        return LivenessStatusResponse(
+            status=res["status"],
+            liveness_status=res.get("liveness_status"),
+            face_match_status=res.get("face_match_status"),
+            human_review_required=res.get("human_review_required", False)
+        )
+
+    @staticmethod
+    async def process_liveness_sandbox(payload: LivenessSandboxPayload, user_id: str) -> LivenessStatusResponse:
+        res = SandboxKycVendorAdapter.process_liveness_callback(user_id, payload)
+        return LivenessStatusResponse(
+            status=res["status"],
+            liveness_status=res.get("liveness_status"),
+            face_match_status=res.get("face_match_status"),
+            human_review_required=res.get("human_review_required", False)
         )

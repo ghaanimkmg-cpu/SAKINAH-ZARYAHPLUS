@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   SakinahJourneyFrame, 
@@ -7,10 +7,45 @@ import {
   SakinahChoiceChip,
   DevFallbackBadge
 } from '../components';
+import { startKycFlow, submitKycSandbox } from '../services/sakinahApi';
 
 export const SakinahKycPage: React.FC = () => {
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState<string>('aadhaar');
+  const [loading, setLoading] = useState(false);
+  const [vendorStatus, setVendorStatus] = useState<string>('PENDING');
+
+  useEffect(() => {
+    startKycFlow().then(res => {
+      setVendorStatus(res.status);
+    }).catch(err => {
+      console.error(err);
+      setVendorStatus('ERROR');
+    });
+  }, []);
+
+  const handleVerify = async () => {
+    if (vendorStatus === 'VENDOR_NOT_CONFIGURED') {
+      alert("Vendor is not configured for production yet.");
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      // In a real flow, we would redirect to vendor SDK
+      // Here we hit the sandbox completion endpoint
+      await submitKycSandbox({
+        verified_name: "Ayman (Sandbox)",
+        verified_age: 28,
+        verified_gender: "MALE"
+      });
+      navigate('/sakinah/liveness');
+    } catch (e: any) {
+      alert(e.message || "KYC Sandbox failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SakinahJourneyFrame>
@@ -21,7 +56,11 @@ export const SakinahKycPage: React.FC = () => {
       />
 
       <div className="mb-4">
-        <DevFallbackBadge message="Production KYC vendor pending. Safe sandbox mode." />
+        {vendorStatus === 'VENDOR_NOT_CONFIGURED' ? (
+          <DevFallbackBadge message="Production vendor pending. Verification disabled." />
+        ) : (
+          <DevFallbackBadge message="Production KYC vendor pending. Safe sandbox mode." />
+        )}
       </div>
 
       <div className="sk-meta-row sk-fx sk-d1">
@@ -78,8 +117,8 @@ export const SakinahKycPage: React.FC = () => {
       </div>
 
       <div className="sk-fx sk-d3 mt-4">
-        <SakinahButton variant="primary" onClick={() => navigate('/sakinah/liveness')}>
-          Verify with DigiLocker →
+        <SakinahButton variant="primary" onClick={handleVerify} disabled={loading || vendorStatus === 'VENDOR_NOT_CONFIGURED'}>
+          {loading ? 'Verifying...' : 'Verify with DigiLocker →'}
         </SakinahButton>
       </div>
     </SakinahJourneyFrame>

@@ -25,7 +25,7 @@ def test_important_endpoints_exist():
     
     # KYC
     assert "/api/v1/nis/kyc/start" in routes
-    assert "/api/v1/nis/kyc/callback" in routes
+    assert "/api/v1/nis/kyc/sandbox/complete" in routes
     assert "/api/v1/nis/eligibility/me" in routes
     
     # Profile / Preferences

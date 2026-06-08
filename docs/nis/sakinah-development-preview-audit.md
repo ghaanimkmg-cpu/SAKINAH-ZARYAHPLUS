@@ -17,13 +17,15 @@ These pages are static onboarding or purely informative. They are considered pro
   - **Why preview exists:** Designed purely for internal QA of the NIS algorithm.
   - **Required Action:** Ensure this is strictly restricted in production environments via 403 blocks.
 
-### Pending External Vendors
+### Pending External Vendors (Sandbox Wired)
 - `/sakinah/kyc`
+  - **Current State:** API connected via `SandboxKycVendorAdapter`.
   - **Preview Badge:** "Production KYC vendor pending. Safe sandbox mode."
-  - **Missing:** Integration with the official third-party KYC provider.
+  - **Production:** Requires real vendor API keys; otherwise blocked with `VENDOR_NOT_CONFIGURED`.
 - `/sakinah/liveness`
+  - **Current State:** API connected via `SandboxKycVendorAdapter`.
   - **Preview Badge:** "Production Liveness vendor pending. No real selfie collected."
-  - **Missing:** Integration with the official third-party biometric liveness provider.
+  - **Production:** Requires real vendor API keys; otherwise blocked with `VENDOR_NOT_CONFIGURED`.
 
 ### Pending Database Persistence APIs
 These routes are purely frontend placeholders. Their data is not saved to the backend yet.

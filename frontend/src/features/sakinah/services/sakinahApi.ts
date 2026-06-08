@@ -183,3 +183,35 @@ export async function updatePortrait(data: { portrait_data: any }) {
 export async function getNisProofReport() {
   return fetchNisApi('/dev/proof-report');
 }
+
+// KYC Vendor Adapter endpoints
+export async function startKycFlow() {
+  return fetchNisApi('/kyc/start', { method: 'POST' });
+}
+
+export async function getKycStatus() {
+  return fetchNisApi('/kyc/status');
+}
+
+export async function submitKycSandbox(data: any) {
+  return fetchNisApi('/kyc/sandbox/complete', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+
+// Liveness Vendor Adapter endpoints
+export async function startLivenessFlow() {
+  return fetchNisApi('/liveness/start', { method: 'POST' });
+}
+
+export async function getLivenessStatus() {
+  return fetchNisApi('/liveness/status');
+}
+
+export async function submitLivenessSandbox(data: any) {
+  return fetchNisApi('/liveness/sandbox/complete', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
